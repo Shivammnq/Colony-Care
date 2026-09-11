@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Stellar Park Apartments",
+    "address": "C-58/24, BHA Millenium Road, C Block, Phase 2",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 80,
+    "year": 2008,
+    "desc": "A premium low-rise residential cluster featuring 3 BHK apartments with three-side open layouts, located close to the Fortis Hospital."
+  },
+  {
+    "name": "Mecon Apartments",
+    "address": "C-58/10, Sector 62 Road, C Block, Phase 2",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 160,
+    "year": 2004,
+    "desc": "An established CGHS society featuring highly spacious 2 and 3 BHK apartments with massive balconies, situated right next to the metro station."
+  },
+  {
+    "name": "Rajat Vihar C Block Apartments",
+    "address": "C Block Road, Rajat Vihar, Block B, Sector 62A",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201020",
+    "flats": 450,
+    "year": 2003,
+    "desc": "Built by the Noida Authority, this expansive gated society stands out for its distinctive greenery, park-facing blocks, and family-oriented environment."
+  },
+  {
+    "name": "ShaktiKunj Apartment",
+    "address": "9/3, Block B, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 216,
+    "year": 2006,
+    "desc": "A large gated residential development consisting of multiple G+8 storied towers offering mid-range contemporary apartments with 24/7 security."
+  },
+  {
+    "name": "Designers Park Apartments",
+    "address": "Block-D, Behind Fortis Hospital Residential, Block B",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 180,
+    "year": 2005,
+    "desc": "A popular high-density group housing community situated in a prime corporate hub, widely preferred by IT professionals due to its strategic location."
+  },
+  {
+    "name": "Yarrows Apartments",
+    "address": "Plot no. C58/5, C Block, Phase 2, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 140,
+    "year": 2006,
+    "desc": "A highly central multistory apartment building offering comfortable layout options for working couples and spacious options for families."
+  },
+  {
+    "name": "Varun Apartment",
+    "address": "C-58/28, C Block, Phase 2, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 110,
+    "year": 2005,
+    "desc": "A peaceful complex featuring functional layouts, excellent power backup services, and extreme closeness to the local local C-Block market blocks."
+  },
+  {
+    "name": "Panchvati Apartment",
+    "address": "B-9/9, Delhi Road, Block B, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 125,
+    "year": 2004,
+    "desc": "A well-constructed residential society that boasts a serene environment, an in-house playground, and dedicated security guards."
+  },
+  {
+    "name": "Jeevan Ashray Apartments",
+    "address": "Jeevan Ashray Block-1, C-58/8, Sector 62 Road",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 104,
+    "year": 2007,
+    "desc": "A low-density premium CGHS layout that promises an uncrowded atmosphere, personal parking lots, and close proximity to Fortis Hospital."
+  },
+  {
+    "name": "Reserve Bank Aashiana Apartments",
+    "address": "C58/31, C Block, Phase 2, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 90,
+    "year": 2009,
+    "desc": "An exclusive, tightly guarded executive residential premises offering top-tier maintenance, manicured lawns, and robust community elements."
+  },
+  {
+    "name": "Shaurya Apartments",
+    "address": "B-9/7B, B Block Road, Rasoolpur Nawada",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 135,
+    "year": 2006,
+    "desc": "An accessible gated housing structure that features regular running water supply, power utilities backup, and close proximity to major markets."
+  },
+  {
+    "name": "Vasant Apartments",
+    "address": "C-58/2, C Block, Phase 2, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 210,
+    "year": 2005,
+    "desc": "A vast, family-oriented residential community known for its high-gentry crowd, clean open areas, and daily-need convenience shops."
+  },
+  {
+    "name": "Swagatam Apartments",
+    "address": "C-58/7, Sector 62 Road, C Block, Phase 2",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 120,
+    "year": 2004,
+    "desc": "A classic residential project situated directly along the main sector road, delivering prompt metro access and basic comfort amenities."
+  },
+  {
+    "name": "Snehkunj Apartments",
+    "address": "58/13, Sector 62 Road, C Block, Phase 2",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 96,
+    "year": 2005,
+    "desc": "A welcoming residential society highly sought after by students and corporate individuals, featuring diverse 1 RK and 2 BHK unit setups."
+  },
+  {
+    "name": "Indian Oil Apartments",
+    "address": "C Block, Phase 2, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 240,
+    "year": 2003,
+    "desc": "A highly secure corporate-allotted residential colony that has broad internal pathways, children parks, and mature community infrastructure."
+  },
+  {
+    "name": "Sagar Apartments",
+    "address": "Near Shramdeep Apartments, C Block, Sec 62 CH1",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 150,
+    "year": 2006,
+    "desc": "A cozy, well-placed community located adjacent to the popular TOT Mall, highly praised for low monthly maintenance fees and high safety."
+  },
+  {
+    "name": "Lavanya Apartments",
+    "address": "C-58/09, C Block, Phase 2, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 115,
+    "year": 2005,
+    "desc": "A robustly constructed multistory society featuring standard apartment balconies and reliable round-the-clock manual entrance screening."
+  },
+  {
+    "name": "Jagadambe Apartment",
+    "address": "C58/25, Market, near TOT MALL, C Block",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 85,
+    "year": 2007,
+    "desc": "A boutique tower complex offering premium high-budget ready-to-move 3 BHK variants right at the commercial heart of Sector 62."
+  },
+  {
+    "name": "GAIL Apartments",
+    "address": "Govind Pur Laheriasarai, near Fortis Hospital, Block B",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201309",
+    "flats": 320,
+    "year": 2004,
+    "desc": "An impeccably clean government-gentry welfare society known for extra-large living spaces, spacious balconies, and strict code upkeep."
+  },
+  {
+    "name": "Akanksha Apartments",
+    "address": "B-9/12, Block B, Industrial Area",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "pincode": "201301",
+    "flats": 175,
+    "year": 2006,
+    "desc": "A well-bounded group housing layout presenting functional urban residential units with green peripheral boundaries and internal community halls."
+  }
+]

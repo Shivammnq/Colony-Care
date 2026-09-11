@@ -1,0 +1,44 @@
+# =========================
+# ColonyCare - Git Ignore
+# =========================
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Google OAuth credentials
+config/google_credentials.php
+
+# Local database/config backups
+*.sql
+*.sql.zip
+*.bak
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Local/test/debug files
+dbtest.php
+test_mail.php
+
+# Database inspection / repair scripts
+db/_inspect.php
+fix/_db.php
+patch/_db.php
+seed/_data.php
+
+# Uploaded user files
+uploads/*
+!uploads/.gitkeep
+
+# QR/generated files
+phpqrcode/cache/*
