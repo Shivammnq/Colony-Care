@@ -42,3 +42,8 @@ uploads/*
 
 # QR/generated files
 phpqrcode/cache/*
+
+db_inspect.php
+fix_db.php
+patch_db.php
+seed_data.php
