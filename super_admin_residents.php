@@ -2,13 +2,10 @@
 session_start();
 
 if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_admin') {
-    header('Location: /shivam/login.php?redirect=' . urlencode('/shivam/super_admin_residents.php')); exit;
+    header('Location: /login.php?redirect=' . urlencode('/super_admin_residents.php')); exit;
 }
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $msg = $_SESSION['sa_flash_msg'] ?? '';
 $err = $_SESSION['sa_flash_err'] ?? '';
@@ -20,11 +17,7 @@ $societies_list = [];
 $validRoles = ['admin','staff','resident','accountant','vendor','society_member','buyer','super_admin'];
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['toggle_user'])) {
@@ -92,7 +85,7 @@ try {
 
         if (!empty($msg)) $_SESSION['sa_flash_msg'] = $msg;
         if (!empty($err)) $_SESSION['sa_flash_err'] = $err;
-        header('Location: /shivam/super_admin_residents.php'); exit;
+        header('Location: /super_admin_residents.php'); exit;
     }
 
     $users_list = $pdo->query("

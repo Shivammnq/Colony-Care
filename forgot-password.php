@@ -169,7 +169,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;disp
     <div class="fp-title">Set New Password</div>
     <div class="fp-sub">Create a strong password for your account.</div>
 
-    <form method="POST" action="/shivam/process_forgot_password.php">
+    <form method="POST" action="/process_forgot_password.php">
         <div class="ff">
             <label>New Password</label>
             <div class="pass-wrap">
@@ -193,7 +193,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;disp
 
     <?php endif; ?>
 
-    <a href="/shivam/login.php" class="back-link"><i class="fa fa-arrow-left"></i> Back to Login</a>
+    <a href="/login.php" class="back-link"><i class="fa fa-arrow-left"></i> Back to Login</a>
 </div>
 
 <script>
@@ -207,7 +207,7 @@ function sendForgotOtp(){
     const btn = document.getElementById('btnSendOtp');
     btn.disabled = true; btn.textContent = 'Sending...';
 
-    fetch('/shivam/otp_forgot_handler.php',{
+    fetch('/otp_forgot_handler.php',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'send',email})
@@ -241,14 +241,14 @@ function verifyForgotOtp(){
     const btn = document.getElementById('btnVerifyOtp');
     btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Verifying...';
 
-    fetch('/shivam/otp_forgot_handler.php',{
+    fetch('/otp_forgot_handler.php',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'verify',email,otp})
     }).then(r=>r.json()).then(data=>{
         if(data.success){
             setStatus('emailStatus','✅ Verified! Redirecting...','success');
-            setTimeout(()=>window.location.href='/shivam/forgot-password.php?step=3',800);
+            setTimeout(()=>window.location.href='/forgot-password.php?step=3',800);
         } else {
             setStatus('emailStatus', data.message || 'Incorrect OTP.','error');
             btn.disabled = false; btn.innerHTML = '<i class="fa fa-arrow-right"></i> Verify & Continue';
@@ -265,14 +265,14 @@ function verifyForgotOtp2(){
     const otp   = document.getElementById('fpOtp2')?.value.trim();
     if(!otp){setStatus('emailStatus2','Please enter the OTP.','error');return;}
 
-    fetch('/shivam/otp_forgot_handler.php',{
+    fetch('/otp_forgot_handler.php',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'verify',email,otp})
     }).then(r=>r.json()).then(data=>{
         if(data.success){
             setStatus('emailStatus2','✅ Verified!','success');
-            setTimeout(()=>window.location.href='/shivam/forgot-password.php?step=3',800);
+            setTimeout(()=>window.location.href='/forgot-password.php?step=3',800);
         } else {
             setStatus('emailStatus2', data.message || 'Incorrect OTP.','error');
         }
@@ -281,7 +281,7 @@ function verifyForgotOtp2(){
 
 function resendOtp(){
     const email = '<?= addslashes($_SESSION['forgot_otp']['email'] ?? '') ?>';
-    fetch('/shivam/otp_forgot_handler.php',{
+    fetch('/otp_forgot_handler.php',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'send',email})

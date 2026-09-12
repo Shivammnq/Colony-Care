@@ -7,10 +7,7 @@ session_start();
 // ═══════════════════════════════════════════════════════════════
 require_once __DIR__ . '/config/google_credentials.php';
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 function curl_post($url, $fields) {
     $ch = curl_init($url);
@@ -39,7 +36,7 @@ function curl_get($url, $headers = []) {
 if (!isset($_GET['code'])) {
     if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
         $_SESSION['login_error'] = 'Google login is not configured yet. Please add your Client ID and Secret in google_callback.php.';
-        header('Location: /shivam/login.php'); exit;
+        header('Location: /login.php'); exit;
     }
     $params = http_build_query([
         'client_id'     => GOOGLE_CLIENT_ID,
@@ -63,7 +60,7 @@ $tokenData = curl_post('https://oauth2.googleapis.com/token', [
 
 if (empty($tokenData['access_token'])) {
     $_SESSION['login_error'] = 'Google login failed. Please try again or use your email and password.';
-    header('Location: /shivam/login.php'); exit;
+    header('Location: /login.php'); exit;
 }
 
 // ── Step 3: fetch the person's Google profile ──
@@ -73,7 +70,7 @@ $profile = curl_get('https://www.googleapis.com/oauth2/v3/userinfo', [
 
 if (empty($profile['email'])) {
     $_SESSION['login_error'] = 'Could not retrieve your Google account details. Please try again.';
-    header('Location: /shivam/login.php'); exit;
+    header('Location: /login.php'); exit;
 }
 
 $g_email = trim($profile['email']);
@@ -81,11 +78,7 @@ $g_name  = trim($profile['name'] ?? explode('@', $g_email)[0]);
 
 // ── Step 4: look up or create the user ──
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
 
     $stmt = $pdo->prepare("
         SELECT id, name, email, role, is_active,
@@ -118,7 +111,7 @@ try {
 
     if (!$user['is_active']) {
         $_SESSION['login_error'] = 'Your account is pending admin approval. Please contact your society admin.';
-        header('Location: /shivam/login.php'); exit;
+        header('Location: /login.php'); exit;
     }
 
     // ── Log them in (same session shape as the normal password login) ──
@@ -134,7 +127,7 @@ try {
     // Honor a pending "return here after login" target set by login.php
     // (e.g. someone clicked "Login to view contact" on listings.php)
     $pendingRedirect = $_SESSION['post_login_redirect'] ?? null;
-    if ($pendingRedirect && str_starts_with($pendingRedirect, '/shivam/') && !str_contains($pendingRedirect, '://')) {
+    if ($pendingRedirect && str_starts_with($pendingRedirect, '/') && !str_contains($pendingRedirect, '://')) {
         unset($_SESSION['post_login_redirect']);
         header('Location: ' . $pendingRedirect); exit;
     }
@@ -147,22 +140,22 @@ try {
         $is_owner = (bool)$own->fetchColumn();
     }
 
-    if ($is_owner) { header('Location: /shivam/society.php'); exit; }
+    if ($is_owner) { header('Location: /society.php'); exit; }
 
     $redirect = match($user['role']) {
-        'admin'          => '/shivam/admin_dashboard.php',
-        'staff'          => '/shivam/gate_staff.php',
-        'resident'       => '/shivam/resident.php',
-        'accountant'     => '/shivam/accountant.php',
-        'vendor'         => '/shivam/vendor.php',
-        'society_member' => '/shivam/society-member.php',
-        'buyer'          => '/shivam/listings.php',
-        'super_admin'    => '/shivam/super_admin.php',
-        default          => '/shivam/resident.php',
+        'admin'          => '/admin_dashboard.php',
+        'staff'          => '/gate_staff.php',
+        'resident'       => '/resident.php',
+        'accountant'     => '/accountant.php',
+        'vendor'         => '/vendor.php',
+        'society_member' => '/society-member.php',
+        'buyer'          => '/listings.php',
+        'super_admin'    => '/super_admin.php',
+        default          => '/resident.php',
     };
     header('Location: ' . $redirect); exit;
 
 } catch (PDOException $e) {
     $_SESSION['login_error'] = 'Database error during Google login: ' . $e->getMessage();
-    header('Location: /shivam/login.php'); exit;
+    header('Location: /login.php'); exit;
 }

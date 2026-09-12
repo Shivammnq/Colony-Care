@@ -1,11 +1,9 @@
 <?php
+require_once __DIR__ . '/config.php';
+
 if (isset($_SESSION['user_id'])) {
     try {
-        $pdoGuard = new PDO(
-            "mysql:host=localhost;dbname=cc;charset=utf8mb4",
-            "root", "",
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
+        $pdoGuard = get_db_connection();
 
         // Make sure the column exists (safe to run repeatedly)
         $hasCol = $pdoGuard->query("SHOW COLUMNS FROM users LIKE 'token_version'")->fetch();
@@ -20,12 +18,12 @@ if (isset($_SESSION['user_id'])) {
         if ($dbTokenVersion === false || (int)$dbTokenVersion !== (int)($_SESSION['token_version'] ?? -1)) {
             $_SESSION = [];
             session_destroy();
-            header('Location: /shivam/login.php?redirect=' . urlencode($_SERVER['REQUEST_URI'])); exit;
+            header('Location: /login.php?redirect=' . urlencode($_SERVER['REQUEST_URI'])); exit;
         }
     } catch (PDOException $e) {
         // Fail closed — if we can't verify the session, don't trust it.
         $_SESSION = [];
         session_destroy();
-        header('Location: /shivam/login.php'); exit;
+        header('Location: /login.php'); exit;
     }
 }

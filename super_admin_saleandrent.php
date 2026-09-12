@@ -2,13 +2,10 @@
 session_start();
 
 if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_admin') {
-    header('Location: /shivam/login.php?redirect=' . urlencode('/shivam/super_admin_saleandrent.php')); exit;
+    header('Location: /login.php?redirect=' . urlencode('/super_admin_saleandrent.php')); exit;
 }
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $msg = $err = '';
 $pageTitle = 'Sale & Rent';
@@ -16,11 +13,7 @@ $activeNav = 'saleandrent';
 $reports_list = [];
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS listing_reports (
         id INT AUTO_INCREMENT PRIMARY KEY, listing_id INT NOT NULL, reporter_user_id INT DEFAULT NULL,
@@ -42,7 +35,7 @@ try {
             $pdo->prepare("UPDATE listing_reports SET status='reviewed' WHERE listing_id=? AND status='pending'")->execute([$lid]);
             $msg = 'Reports dismissed for this listing.';
         }
-        header('Location: /shivam/super_admin_saleandrent.php'); exit;
+        header('Location: /super_admin_saleandrent.php'); exit;
     }
 
     // All active listings, plus a flag for whether they have pending reports

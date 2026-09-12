@@ -1,16 +1,13 @@
 <?php
 session_start();
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $error = '';
 
 // Already logged in → redirect away
 if (isset($_SESSION['user_id'])) {
-    header('Location: /shivam/listings.php'); exit;
+    header('Location: /listings.php'); exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,11 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Password must be at least 8 characters.';
     } else {
         try {
-            $pdo = new PDO(
-                "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-                DB_USER, DB_PASS,
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-            );
+            $pdo = get_db_connection();
 
             // ── Migration: society_id must be nullable so buyer accounts
             //    (which have no society) can satisfy the foreign key ──
@@ -52,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ")->execute([$name, $email, $phone, $hashed]);
 
                 $_SESSION['login_success'] = 'Account created! You can now log in to view contact details and message flat owners.';
-                header('Location: /shivam/login.php'); exit;
+                header('Location: /login.php'); exit;
             }
         } catch (PDOException $e) {
             $error = 'Database error: ' . $e->getMessage();
@@ -68,11 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Looking to Buy or Rent a Flat? - ColonyCare</title>
 <meta name="description" content="Create a free ColonyCare account to browse verified flat listings and message owners directly — no brokerage, no society membership required.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.example.com/shivam/register-buyer.php">
+<link rel="canonical" href="https://www.example.com/register-buyer.php">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Looking to Buy or Rent a Flat? - ColonyCare">
 <meta property="og:description" content="Create a free ColonyCare account to browse verified flat listings and message owners directly — no brokerage, no society membership required.">
-<meta property="og:url" content="https://www.example.com/shivam/register-buyer.php">
+<meta property="og:url" content="https://www.example.com/register-buyer.php">
 <meta property="og:site_name" content="ColonyCare">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
@@ -124,7 +117,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
 <div class="login-page">
 
     <div class="login-left">
-        <a href="/shivam/index.php" class="back-home"><i class="fa fa-arrow-left"></i> Back to Home</a>
+        <a href="/index.php" class="back-home"><i class="fa fa-arrow-left"></i> Back to Home</a>
         <div class="login-brand">
             <div class="brand-icon"><i class="fa fa-building"></i></div>
             <h2>ColonyCare</h2>
@@ -190,7 +183,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
 
         <div class="divider"><span>or</span></div>
 
-        <a href="/shivam/google_callback.php" class="btn-google">
+        <a href="/google_callback.php" class="btn-google">
             <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.9 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
                 <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
@@ -201,10 +194,10 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
         </a>
 
         <div class="register-row">
-            Already have an account? <a href="/shivam/login.php">Login</a>
+            Already have an account? <a href="/login.php">Login</a>
         </div>
         <div class="register-row">
-            Are you a resident? <a href="/shivam/register.php">Register your unit instead</a>
+            Are you a resident? <a href="/register.php">Register your unit instead</a>
         </div>
 
     </div>

@@ -1,22 +1,19 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) { header('Location: /shivam/login.php'); exit; }
+if (!isset($_SESSION['user_id'])) { header('Location: /login.php'); exit; }
 $role = $_SESSION['user_role'] ?? 'resident';
-if ($role !== 'admin') { header('Location: /shivam/login.php'); exit; }
+if ($role !== 'admin') { header('Location: /login.php'); exit; }
 
 $user_id    = $_SESSION['user_id'];
 $user_name  = $_SESSION['user_name'] ?? 'Admin';
 $society_id = $_SESSION['user_society_id'] ?? 0;
-if (!$society_id) { header('Location: /shivam/login.php'); exit; }
+if (!$society_id) { header('Location: /login.php'); exit; }
 
-define('DB_HOST','localhost'); define('DB_NAME','cc'); define('DB_USER','root'); define('DB_PASS','');
+// DB constants loaded via config.php
 $msg = $err = '';
 
 try {
-    $pdo = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4", DB_USER, DB_PASS,[
-        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC
-    ]);
+    $pdo = get_db_connection();
 
     require_once __DIR__ . '/notify_helper.php';
 
@@ -83,8 +80,8 @@ try {
     $ownChk = $pdo->prepare("SELECT owner_id, society_name FROM societies WHERE id = ? LIMIT 1");
     $ownChk->execute([$society_id]);
     $socRow = $ownChk->fetch();
-    if (!$socRow) { header('Location: /shivam/login.php'); exit; }
-    if ((int)$socRow['owner_id'] === (int)$user_id) { header('Location: /shivam/society.php'); exit; }
+    if (!$socRow) { header('Location: /login.php'); exit; }
+    if ((int)$socRow['owner_id'] === (int)$user_id) { header('Location: /society.php'); exit; }
 
     $owner_id           = (int)$socRow['owner_id'];
     $page_society_name  = $socRow['society_name'];
@@ -149,7 +146,7 @@ try {
 
                 notify($pdo, $society_id, $uid, $user_id, 'approval',
                     'Your registration has been approved! Welcome to ' . $page_society_name . '.',
-                    '/shivam/resident.php'
+                    '/resident.php'
                 );
 
                 $msg = '✅ Access granted to ' . htmlspecialchars($u['name']) . ' (' . htmlspecialchars($u['email']) . ').';
@@ -216,7 +213,7 @@ try {
                 if ($billRow) {
                     notify($pdo, $society_id, $billRow['user_id'], $user_id, 'verification',
                         'Your payment of ₹' . number_format($billRow['amount'], 0) . ' has been verified and confirmed.',
-                        '/shivam/resident.php#tab-payments'
+                        '/resident.php#tab-payments'
                     );
                 }
 
@@ -241,7 +238,7 @@ try {
                 if ($billRow) {
                     notify($pdo, $society_id, $billRow['user_id'], $user_id, 'rejection',
                         'Your payment proof was rejected. Please re-upload a valid screenshot.',
-                        '/shivam/resident.php#tab-payments'
+                        '/resident.php#tab-payments'
                     );
                 }
 
@@ -304,7 +301,7 @@ try {
                         $admins = get_owner_and_admins($pdo, $society_id);
                         notify($pdo, $society_id, $admins, $user_id, 'payment',
                             $_SESSION['user_name'] . ' submitted payment proof for ₹' . number_format($b_amount, 0),
-                            '/shivam/society.php#tab-maintenance'
+                            '/society.php#tab-maintenance'
                         );
 
                         $msg = 'Payment submitted! The society owner will verify and confirm shortly.';
@@ -420,7 +417,7 @@ try {
             }
         }
 
-        header('Location: /shivam/admin_dashboard.php'); exit;
+        header('Location: /admin_dashboard.php'); exit;
     }
 
     // ── Fetch stats
@@ -907,8 +904,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-prim
             </div>
         </div>
     </div>
-    <a href="/shivam/index.php" class="tb-btn tb-back"><i class="fa fa-arrow-left"></i> Back</a>
-    <a href="/shivam/auth/logout.php" class="tb-btn tb-logout"><i class="fa fa-right-from-bracket"></i> Logout</a>
+    <a href="/index.php" class="tb-btn tb-back"><i class="fa fa-arrow-left"></i> Back</a>
+    <a href="/auth/logout.php" class="tb-btn tb-logout"><i class="fa fa-right-from-bracket"></i> Logout</a>
     <button class="ham-btn" onclick="openAdminMobNav()" aria-label="Menu"><i class="fa fa-bars"></i></button>
   </div>
 </header>
@@ -933,8 +930,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-prim
       <button class="mob-nav-item" onclick="switchTab('reports',null);closeAdminMobNav()"><i class="fa fa-chart-bar"></i> Reports</button>
     </div>
     <div class="mob-nav-foot">
-      <a href="/shivam/index.php" class="mob-back-btn"><i class="fa fa-arrow-left"></i> Back to Home</a>
-      <a href="/shivam/auth/logout.php" class="mob-logout-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
+      <a href="/index.php" class="mob-back-btn"><i class="fa fa-arrow-left"></i> Back to Home</a>
+      <a href="/auth/logout.php" class="mob-logout-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
     </div>
   </div>
 </div>
@@ -1740,7 +1737,7 @@ function openPayModal(billId, desc, amount){
 
 // ── Payment proof viewer ──
 function openProofModal(billId, filename, residentName, desc, amount, txnRef, status){
-  document.getElementById('proofImg').src = '/shivam/uploads/payment_proofs/' + filename;
+  document.getElementById('proofImg').src = '/uploads/payment_proofs/' + filename;
   document.getElementById('proofResident').textContent = residentName;
   document.getElementById('proofDesc').textContent = desc;
   document.getElementById('proofAmount').textContent = '₹' + parseFloat(amount).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -1808,7 +1805,7 @@ function timeAgo(dateStr) {
 }
 
 function fetchNotifications() {
-    fetch('/shivam/notification_handler.php?action=fetch')
+    fetch('/notification_handler.php?action=fetch')
         .then(r=>r.json())
         .then(data=>{
             const badge = document.getElementById('notifBadge');
@@ -1844,7 +1841,7 @@ function fetchNotifications() {
 
 function markRead(id, e, link) {
     e.preventDefault();
-    fetch('/shivam/notification_handler.php', {
+    fetch('/notification_handler.php', {
         method:'POST',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:`action=mark_read&id=${id}`
@@ -1855,7 +1852,7 @@ function markRead(id, e, link) {
 }
 
 function markAllRead() {
-    fetch('/shivam/notification_handler.php', {
+    fetch('/notification_handler.php', {
         method:'POST',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:'action=mark_read&id=0'

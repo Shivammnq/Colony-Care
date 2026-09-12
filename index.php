@@ -1,7 +1,7 @@
 <?php
 $pageTitle = "ColonyCare - Society Management Platform for RWAs";
 $pageDescription = "Manage visitor entry, billing, complaints, events, and facility booking for your residential society — all in one platform. Trusted by 500+ communities.";
-$pageCanonical = 'https://www.example.com/shivam/index.php';
+$pageCanonical = 'https://www.example.com/index.php';
 $extraSchema = [
     '@context' => 'https://schema.org',
     '@type' => 'WebSite',
@@ -9,7 +9,7 @@ $extraSchema = [
     'url' => $pageCanonical,
     'potentialAction' => [
         '@type' => 'SearchAction',
-        'target' => 'https://www.example.com/shivam/societies.php?q={search_term_string}',
+        'target' => 'https://www.example.com/societies.php?q={search_term_string}',
         'query-input' => 'required name=search_term_string',
     ],
 ];
@@ -477,10 +477,8 @@ include('header.php');
 // ── Fetch societies from DB ────────────────────────────────
 $featured_societies = [];
 try {
-    $pdo_fs = new PDO("mysql:host=localhost;dbname=cc;charset=utf8mb4", "root", "", [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    require_once __DIR__ . '/config.php';
+    $pdo_fs = get_db_connection();
     $featured_societies = $pdo_fs->query("
         SELECT id, society_name, city, state, pincode, total_flats, established_year, description
         FROM societies
@@ -516,7 +514,7 @@ function societySlug($name) {
                 <h2>Featured Societies</h2>
                 <p class="sub-text">Explore residential societies powered by ColonyCare - view amenities, events, gallery and available properties.</p>
             </div>
-            <a href="/shivam/societies.php" class="fs-browse-btn">Browse all <i class="fa fa-arrow-right"></i></a>
+            <a href="/societies.php" class="fs-browse-btn">Browse all <i class="fa fa-arrow-right"></i></a>
         </div>
 
         <div class="fs-grid">
@@ -529,7 +527,7 @@ function societySlug($name) {
                 $desc  = $soc['description'] ? (strlen($soc['description']) > 100 ? substr($soc['description'],0,100).'...' : $soc['description']) : '';
                 $isFirst = ($i === 0); // first card has no image (icon placeholder style)
             ?>
-            <a href="/shivam/society-profile.php?slug=<?= urlencode($slug) ?>&id=<?= $soc['id'] ?>"
+            <a href="/society-profile.php?slug=<?= urlencode($slug) ?>&id=<?= $soc['id'] ?>"
                class="fs-card <?= $isFirst ? 'fs-card-placeholder' : '' ?>">
 
                 <?php if ($isFirst): ?>

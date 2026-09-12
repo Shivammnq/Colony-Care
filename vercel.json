@@ -1,16 +1,22 @@
 {
+  "version": 2,
   "functions": {
-    "api/**/*.php": {
-      "runtime": "vercel-php@0.7.3"
-    },
-    "*.php": {
-      "runtime": "vercel-php@0.7.3"
+    "api/index.php": {
+      "runtime": "vercel-php@0.7.3",
+      "includeFiles": "**"
     }
   },
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/shivam/(.*)$",
+      "dest": "/api/index.php"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/index.php"
+      "dest": "/api/index.php"
     }
   ]
 }

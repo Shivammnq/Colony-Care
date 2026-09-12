@@ -6,10 +6,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_ad
     echo json_encode(['success'=>false, 'error'=>'Unauthorized']); exit;
 }
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $q = trim($_GET['q'] ?? '');
 if (strlen($q) < 2) {
@@ -17,11 +14,7 @@ if (strlen($q) < 2) {
 }
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
 
     $like = '%' . $q . '%';
 

@@ -1,23 +1,20 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) { header('Location: /shivam/login.php'); exit; }
+if (!isset($_SESSION['user_id'])) { header('Location: /login.php'); exit; }
 $role = $_SESSION['user_role'] ?? 'resident';
-if ($role === 'admin') { header('Location: /shivam/admin_dashboard.php'); exit; }
-if ($role !== 'accountant') { header('Location: /shivam/login.php'); exit; }
+if ($role === 'admin') { header('Location: /admin_dashboard.php'); exit; }
+if ($role !== 'accountant') { header('Location: /login.php'); exit; }
 
 $user_id    = $_SESSION['user_id'];
 $user_name  = $_SESSION['user_name'] ?? 'Accountant';
 $society_id = $_SESSION['user_society_id'] ?? 0;
-if (!$society_id) { header('Location: /shivam/login.php'); exit; }
+if (!$society_id) { header('Location: /login.php'); exit; }
 
-define('DB_HOST','localhost'); define('DB_NAME','cc'); define('DB_USER','root'); define('DB_PASS','');
+// DB constants loaded via config.php
 $msg = $err = '';
 
 try {
-    $pdo = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4", DB_USER, DB_PASS,[
-        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC
-    ]);
+    $pdo = get_db_connection();
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -56,7 +53,7 @@ try {
             }
         }
 
-        header('Location: /shivam/accountant.php'); exit;
+        header('Location: /accountant.php'); exit;
     }
 
     $pdo->prepare("UPDATE billing SET status='overdue' WHERE status='pending' AND due_date < CURDATE() AND society_id=?")->execute([$society_id]);
@@ -313,8 +310,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text-p
             </div>
         </div>
     </div>
-    <a href="/shivam/index.php" class="tb-btn tb-back"><i class="fa fa-arrow-left"></i> Back</a>
-    <a href="/shivam/auth/logout.php" class="tb-btn tb-logout"><i class="fa fa-right-from-bracket"></i> Logout</a>
+    <a href="/index.php" class="tb-btn tb-back"><i class="fa fa-arrow-left"></i> Back</a>
+    <a href="/auth/logout.php" class="tb-btn tb-logout"><i class="fa fa-right-from-bracket"></i> Logout</a>
     <button class="ham-btn" onclick="openAccMobNav()" aria-label="Menu"><i class="fa fa-bars"></i></button>
   </div>
 </header>
@@ -331,8 +328,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text-p
       <button class="mob-nav-item" onclick="switchTab('export',null);closeAccMobNav()"><i class="fa fa-file-export"></i> Export</button>
     </div>
     <div class="mob-nav-foot">
-      <a href="/shivam/index.php" class="mob-back-btn"><i class="fa fa-arrow-left"></i> Back to Home</a>
-      <a href="/shivam/auth/logout.php" class="mob-logout-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
+      <a href="/index.php" class="mob-back-btn"><i class="fa fa-arrow-left"></i> Back to Home</a>
+      <a href="/auth/logout.php" class="mob-logout-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
     </div>
   </div>
 </div>
@@ -718,7 +715,7 @@ const typeIcon = {
 };
 function timeAgo(d){const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)return'Just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
 function fetchNotifications(){
-    fetch('/shivam/notification_handler.php?action=fetch')
+    fetch('/notification_handler.php?action=fetch')
     .then(r=>r.json()).then(data=>{
         const badge=document.getElementById('notifBadge');
         const list=document.getElementById('notifList');
@@ -733,11 +730,11 @@ function fetchNotifications(){
 }
 function markRead(id,e,link){
     e.preventDefault();
-    fetch('/shivam/notification_handler.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`action=mark_read&id=${id}`})
+    fetch('/notification_handler.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`action=mark_read&id=${id}`})
     .then(()=>{if(link&&link!=='#')window.location.href=link;else fetchNotifications();});
 }
 function markAllRead(){
-    fetch('/shivam/notification_handler.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action=mark_read&id=0'})
+    fetch('/notification_handler.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action=mark_read&id=0'})
     .then(()=>fetchNotifications());
 }
 fetchNotifications();

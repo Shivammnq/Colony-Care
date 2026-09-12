@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config.php';
 session_start();
 header('Content-Type: application/json');
 
@@ -19,7 +20,7 @@ if ($action === 'send') {
     }
 
     try {
-        $pdo = new PDO("mysql:host=localhost;dbname=cc;charset=utf8mb4","root","",[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+        $pdo = get_db_connection();
         $chk = $pdo->prepare("SELECT id,name FROM users WHERE email=? LIMIT 1");
         $chk->execute([$email]);
         $user = $chk->fetch();

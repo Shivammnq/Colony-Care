@@ -1,13 +1,11 @@
 <?php
+require_once __DIR__ . '/config.php';
 session_start();
-if (isset($_SESSION['user_id'])) { header('Location: /shivam/login.php'); exit; }
+if (isset($_SESSION['user_id'])) { header('Location: /login.php'); exit; }
 
 // ── DB ─────────────────────────────────────────────────────
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=cc;charset=utf8mb4","root","",[
-        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC
-    ]);
+    $pdo = get_db_connection();
 } catch(Exception $e) { die("DB Error: ".$e->getMessage()); }
 
 // Fetch all societies for dropdown
@@ -25,11 +23,11 @@ unset($_SESSION['reg_errors'], $_SESSION['reg_old']);
 <title>Register as a Resident - ColonyCare</title>
 <meta name="description" content="Create your free ColonyCare resident account to book visitor entry, pay bills, raise complaints, and stay updated on society events.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.example.com/shivam/register.php">
+<link rel="canonical" href="https://www.example.com/register.php">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Register as a Resident - ColonyCare">
 <meta property="og:description" content="Create your free ColonyCare resident account to book visitor entry, pay bills, raise complaints, and stay updated on society events.">
-<meta property="og:url" content="https://www.example.com/shivam/register.php">
+<meta property="og:url" content="https://www.example.com/register.php">
 <meta property="og:site_name" content="ColonyCare">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
@@ -149,7 +147,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#
 <body>
 
 <div class="rs-left">
-    <a href="/shivam/index.php" class="back-home"><i class="fa fa-arrow-left"></i> Back to Home</a>
+    <a href="/index.php" class="back-home"><i class="fa fa-arrow-left"></i> Back to Home</a>
     <div class="rs-brand"><div class="brand-icon"><i class="fa fa-building"></i></div><h2>ColonyCare</h2></div>
     <h1>Join Your Society Today</h1>
     <p>Select your society, choose your role, and get connected with everything your community has to offer.</p>
@@ -182,7 +180,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#
     <div>Please fix:<ul><?php foreach($errors as $e): ?><li><?=htmlspecialchars($e)?></li><?php endforeach; ?></ul></div></div>
     <?php endif; ?>
 
-    <form method="POST" action="/shivam/process_register_resident.php" id="regForm">
+    <form method="POST" action="/process_register_resident.php" id="regForm">
 
         <!-- STEP 1: DETAILS -->
         <div class="form-section active" id="step1">
@@ -203,7 +201,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#
                         </select>
                     </div>
                     <?php if(empty($societies)): ?>
-                    <span style="font-size:.74rem;color:#dc2626">No societies registered yet. <a href="/shivam/register-society.php">Register one first</a>.</span>
+                    <span style="font-size:.74rem;color:#dc2626">No societies registered yet. <a href="/register-society.php">Register one first</a>.</span>
                     <?php endif; ?>
                 </div>
             </div>
@@ -301,7 +299,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#
         </div>
 
     </form>
-    <div class="login-row">Already have an account? <a href="/shivam/login.php">Login</a></div>
+    <div class="login-row">Already have an account? <a href="/login.php">Login</a></div>
 </div>
 </div>
 
@@ -357,7 +355,7 @@ async function sendOTP(type){
     btn.disabled=true; btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Sending...';
     status.className='otp-status info'; status.innerHTML='<i class="fa fa-spinner fa-spin"></i> Sending OTP...';
     try{
-        const res=await fetch('/shivam/otp_resident_handler.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'send',type,value})});
+        const res=await fetch('/otp_resident_handler.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'send',type,value})});
         const data=await res.json();
         if(data.success){
             status.className='otp-status success';
@@ -397,7 +395,7 @@ async function verifyOTP(type){
     if(otp.length!==6){status.className='otp-status error';status.textContent='Enter a 6-digit OTP.';return;}
     status.className='otp-status info'; status.innerHTML='<i class="fa fa-spinner fa-spin"></i> Verifying...';
     try{
-        const res=await fetch('/shivam/otp_resident_handler.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',type,value,otp})});
+        const res=await fetch('/otp_resident_handler.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',type,value,otp})});
         const data=await res.json();
         if(data.success){
             status.className='otp-status success';

@@ -1,20 +1,21 @@
 <?php
+require_once __DIR__ . '/config.php';
 session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header("Location: /shivam/register.php"); exit; }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header("Location: /register.php"); exit; }
 
 // ── Check OTP verification ──────────────────────────────────
 if (empty($_SESSION['res_email_otp_verified']) || empty($_SESSION['res_phone_otp_verified'])) {
     $_SESSION['reg_errors'] = ["Please verify both your email and phone OTP before registering."];
     $_SESSION['reg_old']    = $_POST;
-    header("Location: /shivam/register.php"); exit;
+    header("Location: /register.php"); exit;
 }
 if (($_POST['email_verified'] ?? '0') !== '1' || ($_POST['phone_verified'] ?? '0') !== '1') {
     $_SESSION['reg_errors'] = ["OTP verification incomplete."];
     $_SESSION['reg_old']    = $_POST;
-    header("Location: /shivam/register.php"); exit;
+    header("Location: /register.php"); exit;
 }
 
 function clean($v){ return htmlspecialchars(strip_tags(trim($v))); }
@@ -42,17 +43,14 @@ if (strlen($password) < 8) $errors[] = "Password must be at least 8 characters."
 if (!empty($errors)) {
     $_SESSION['reg_errors'] = $errors;
     $_SESSION['reg_old']    = $_POST;
-    header("Location: /shivam/register.php"); exit;
+    header("Location: /register.php"); exit;
 }
 
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=cc;charset=utf8mb4","root","",[
-        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC
-    ]);
+    $pdo = get_db_connection();
 } catch (PDOException $e) {
     $_SESSION['reg_errors'] = ["Database connection failed: " . $e->getMessage()];
-    header("Location: /shivam/register.php"); exit;
+    header("Location: /register.php"); exit;
 }
 
 // ── Auto-add approval columns if missing ───────────────────
@@ -70,7 +68,7 @@ $soc = $socStmt->fetch();
 if (!$soc) {
     $_SESSION['reg_errors'] = ["Selected society not found."];
     $_SESSION['reg_old']    = $_POST;
-    header("Location: /shivam/register.php"); exit;
+    header("Location: /register.php"); exit;
 }
 $society_name = $soc['society_name'];
 
@@ -80,7 +78,7 @@ $chk->execute([$email]);
 if ($chk->fetch()) {
     $_SESSION['reg_errors'] = ["An account with this email already exists. Please login."];
     $_SESSION['reg_old']    = $_POST;
-    header("Location: /shivam/register.php"); exit;
+    header("Location: /register.php"); exit;
 }
 
 $hashed = password_hash($password, PASSWORD_BCRYPT);
@@ -102,7 +100,7 @@ try {
           $_SESSION['reg_errors'], $_SESSION['reg_old']);
 
     $_SESSION['login_success'] = "✅ Registration submitted! Your request is pending approval from the society owner/admin. You'll be able to login once approved.";
-    header("Location: /shivam/login.php"); exit;
+    header("Location: /login.php"); exit;
 
 } catch (Exception $e) {
     $_SESSION['reg_errors'] = ["Registration failed: " . $e->getMessage()];

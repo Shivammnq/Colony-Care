@@ -1,11 +1,11 @@
 <?php 
-$base_url = "http://localhost/shivam/";
+$base_url = "/";
 
 // ── SEO: pages can set these before include('header.php') to override the defaults ──
 // e.g. $pageTitle = '...'; $pageDescription = '...'; $pageCanonical = '...'; $pageImage = '...'; $pageRobots = 'noindex, nofollow'; $extraSchema = [...];
 $pageTitle       = $pageTitle       ?? "ColonyCare - India's Smartest Colony Management Platform";
 $pageDescription = $pageDescription ?? "Manage your residential society with ColonyCare — visitor management, billing, complaints, event calendar, facility booking, and online payments, all in one platform. Trusted by 500+ communities.";
-$pageCanonical   = $pageCanonical   ?? ('https://www.example.com/shivam/' . basename($_SERVER['PHP_SELF'] ?? 'index.php'));
+$pageCanonical   = $pageCanonical   ?? ('/' . basename($_SERVER['PHP_SELF'] ?? 'index.php'));
 $pageRobots      = $pageRobots      ?? 'index, follow';
 ?>
 <!DOCTYPE html>
@@ -33,7 +33,7 @@ $pageRobots      = $pageRobots      ?? 'index, follow';
     '@context' => 'https://schema.org',
     '@type' => 'Organization',
     'name' => 'ColonyCare',
-    'url' => 'https://www.example.com/shivam/',
+    'url' => 'https://www.example.com/',
     'description' => "India's Smartest Colony Management Platform for visitor management, billing, complaints, and community events.",
 ], JSON_UNESCAPED_SLASHES) ?>
 </script>

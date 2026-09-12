@@ -1,20 +1,18 @@
 <?php
+require_once __DIR__ . '/config.php';
 session_start();
 
 $society_id = intval($_GET['id'] ?? 0);
-if (!$society_id) { header('Location: /shivam/index.php'); exit; }
+if (!$society_id) { header('Location: /index.php'); exit; }
 
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=cc;charset=utf8mb4","root","",[
-        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC
-    ]);
+    $pdo = get_db_connection();
 } catch(Exception $e) { die("DB Error: ".$e->getMessage()); }
 
 $stmt = $pdo->prepare("SELECT * FROM societies WHERE id = ? LIMIT 1");
 $stmt->execute([$society_id]);
 $society = $stmt->fetch();
-if (!$society) { header('Location: /shivam/index.php'); exit; }
+if (!$society) { header('Location: /index.php'); exit; }
 
 
 
@@ -96,7 +94,7 @@ $seoTitle = $society['society_name'] . ($seoCityState ? ' - ' . $seoCityState : 
 $seoDescription = !empty($society['description'])
     ? mb_substr(strip_tags($society['description']), 0, 155)
     : trim($society['society_name'] . ($seoCityState ? " in $seoCityState" : '') . ". $total_flats flats, rated $avg_rating/5 on ColonyCare.");
-$seoCanonical = 'https://www.example.com/shivam/society-profile.php?id=' . (int)$society_id;
+$seoCanonical = 'https://www.example.com/society-profile.php?id=' . (int)$society_id;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -325,7 +323,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
 <div class="cover-wrap">
     <img src="<?= $coverImg ?>" alt="<?= htmlspecialchars($society['society_name']) ?>">
     <div class="cover-overlay"></div>
-    <a href="/shivam/societies.php" class="back-btn"><i class="fa fa-arrow-left"></i> All Societies</a>
+    <a href="/societies.php" class="back-btn"><i class="fa fa-arrow-left"></i> All Societies</a>
     <div class="cover-content">
         <div class="cover-loc"><i class="fa fa-building"></i> <?= htmlspecialchars(trim(($society['city']??'').', '.($society['state']??''),', ')) ?></div>
         <div class="cover-title"><?= htmlspecialchars($society['society_name']) ?></div>
@@ -476,7 +474,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
 
         <div class="cta-section">
             <div class="cta-text">Own or manage a society?</div>
-            <a href="/shivam/register-society.php" class="cta-btn"><i class="fa fa-building"></i> Register Your Society</a>
+            <a href="/register-society.php" class="cta-btn"><i class="fa fa-building"></i> Register Your Society</a>
         </div>
 
     </div>

@@ -2,13 +2,10 @@
 session_start();
 
 if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_admin') {
-    header('Location: /shivam/login.php?redirect=' . urlencode('/shivam/super_admin_owners.php')); exit;
+    header('Location: /login.php?redirect=' . urlencode('/super_admin_owners.php')); exit;
 }
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $msg = $_SESSION['sa_flash_msg'] ?? '';
 $err = $_SESSION['sa_flash_err'] ?? '';
@@ -18,11 +15,7 @@ $activeNav = 'owners';
 $owners_list = [];
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_owner'])) {
         $uid   = (int)$_POST['user_id'];
@@ -44,7 +37,7 @@ try {
         }
         if (!empty($msg)) $_SESSION['sa_flash_msg'] = $msg;
         if (!empty($err)) $_SESSION['sa_flash_err'] = $err;
-        header('Location: /shivam/super_admin_owners.php'); exit;
+        header('Location: /super_admin_owners.php'); exit;
     }
 
     // Deleting an owner means deleting their society (owner + society are tightly coupled;
@@ -76,7 +69,7 @@ try {
         }
         if (!empty($msg)) $_SESSION['sa_flash_msg'] = $msg;
         if (!empty($err)) $_SESSION['sa_flash_err'] = $err;
-        header('Location: /shivam/super_admin_owners.php'); exit;
+        header('Location: /super_admin_owners.php'); exit;
     }
 
     // An "owner" is any user referenced by societies.owner_id
@@ -118,7 +111,7 @@ include __DIR__ . '/super_admin_header.php';
     <td style="padding:12px 16px;font-size:.85rem;font-weight:600;"><?= htmlspecialchars($o['name']) ?></td>
     <td style="padding:12px 16px;font-size:.85rem;"><?= htmlspecialchars($o['email']) ?><br><span style="color:var(--text-muted);font-size:.76rem;"><?= htmlspecialchars($o['phone'] ?? '') ?></span></td>
     <td style="padding:12px 16px;font-size:.85rem;">
-        <a href="/shivam/super_admin_society.php?id=<?= $o['society_id'] ?>" style="color:var(--green-dark);text-decoration:none;font-weight:600;"><?= htmlspecialchars($o['society_name']) ?></a><br>
+        <a href="/super_admin_society.php?id=<?= $o['society_id'] ?>" style="color:var(--green-dark);text-decoration:none;font-weight:600;"><?= htmlspecialchars($o['society_name']) ?></a><br>
         <span style="color:var(--text-muted);font-size:.76rem;"><?= htmlspecialchars(($o['city']??'').', '.($o['state']??'')) ?></span>
     </td>
     <td style="padding:12px 16px;"><span style="background:<?= $badgeColors[$o['society_status']] ?? '#e5e7eb;color:#374151' ?>;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:99px;text-transform:capitalize;"><?= ucfirst($o['society_status']) ?></span></td>

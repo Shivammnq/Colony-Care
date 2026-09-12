@@ -5,18 +5,12 @@ if (!isset($_SESSION['user_id'])) { header('Location: login.php'); exit; }
 $role    = $_SESSION['user_role'] ?? 'resident';
 $user_id = $_SESSION['user_id'];
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $msg = $err = '';
 
 try {
-    $pdo = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4", DB_USER, DB_PASS, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    $pdo = get_db_connection();
 
     // Create table if not exists
     $pdo->exec("CREATE TABLE IF NOT EXISTS complaints (

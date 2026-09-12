@@ -107,35 +107,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-prim
 
     <div class="sb-group">
         <div class="sb-group-label">Overview</div>
-        <a href="/shivam/super_admin.php" class="sb-link <?= $activeNav==='dashboard'?'active':'' ?>"><i class="fa fa-house"></i> Dashboard</a>
+        <a href="/super_admin.php" class="sb-link <?= $activeNav==='dashboard'?'active':'' ?>"><i class="fa fa-house"></i> Dashboard</a>
     </div>
 
     <div class="sb-group">
         <div class="sb-group-label">Operations</div>
-        <a href="/shivam/super_admin_coming_soon.php?f=<?= urlencode('Services & Pricing') ?>" class="sb-link <?= $activeNav==='services'?'active':'' ?>"><i class="fa fa-screwdriver-wrench"></i> Services &amp; Pricing</a>
-        <a href="/shivam/super_admin_coming_soon.php?f=<?= urlencode('Bookings / Enquiries') ?>" class="sb-link <?= $activeNav==='bookings'?'active':'' ?>"><i class="fa fa-calendar-check"></i> Bookings / Enquiries</a>
-        <a href="/shivam/super_admin_coming_soon.php?f=<?= urlencode('Staff & Technicians') ?>" class="sb-link <?= $activeNav==='staff'?'active':'' ?>"><i class="fa fa-user-gear"></i> Staff &amp; Technicians</a>
+        <a href="/super_admin_coming_soon.php?f=<?= urlencode('Services & Pricing') ?>" class="sb-link <?= $activeNav==='services'?'active':'' ?>"><i class="fa fa-screwdriver-wrench"></i> Services &amp; Pricing</a>
+        <a href="/super_admin_coming_soon.php?f=<?= urlencode('Bookings / Enquiries') ?>" class="sb-link <?= $activeNav==='bookings'?'active':'' ?>"><i class="fa fa-calendar-check"></i> Bookings / Enquiries</a>
+        <a href="/super_admin_coming_soon.php?f=<?= urlencode('Staff & Technicians') ?>" class="sb-link <?= $activeNav==='staff'?'active':'' ?>"><i class="fa fa-user-gear"></i> Staff &amp; Technicians</a>
     </div>
 
     <div class="sb-group">
         <div class="sb-group-label">Society</div>
-        <a href="/shivam/super_admin_societies.php" class="sb-link <?= $activeNav==='societies'?'active':'' ?>"><i class="fa fa-city"></i> Societies</a>
-        <a href="/shivam/super_admin_owners.php" class="sb-link <?= $activeNav==='owners'?'active':'' ?>"><i class="fa fa-user-shield"></i> Society Owners</a>
-        <a href="/shivam/super_admin_residents.php" class="sb-link <?= $activeNav==='residents'?'active':'' ?>"><i class="fa fa-people-roof"></i> Residents</a>
-        <a href="/shivam/super_admin_saleandrent.php" class="sb-link <?= $activeNav==='saleandrent'?'active':'' ?>"><i class="fa fa-key"></i> Sale &amp; Rent</a>
+        <a href="/super_admin_societies.php" class="sb-link <?= $activeNav==='societies'?'active':'' ?>"><i class="fa fa-city"></i> Societies</a>
+        <a href="/super_admin_owners.php" class="sb-link <?= $activeNav==='owners'?'active':'' ?>"><i class="fa fa-user-shield"></i> Society Owners</a>
+        <a href="/super_admin_residents.php" class="sb-link <?= $activeNav==='residents'?'active':'' ?>"><i class="fa fa-people-roof"></i> Residents</a>
+        <a href="/super_admin_saleandrent.php" class="sb-link <?= $activeNav==='saleandrent'?'active':'' ?>"><i class="fa fa-key"></i> Sale &amp; Rent</a>
     </div>
 
     <div class="sb-group">
         <div class="sb-group-label">Business</div>
-        <a href="/shivam/super_admin_coming_soon.php?f=<?= urlencode('Customers') ?>" class="sb-link <?= $activeNav==='customers'?'active':'' ?>"><i class="fa fa-user-group"></i> Customers</a>
-        <a href="/shivam/super_admin_coming_soon.php?f=<?= urlencode('Accounts & Invoices') ?>" class="sb-link <?= $activeNav==='accounts'?'active':'' ?>"><i class="fa fa-file-invoice"></i> Accounts &amp; Invoices</a>
+        <a href="/super_admin_coming_soon.php?f=<?= urlencode('Customers') ?>" class="sb-link <?= $activeNav==='customers'?'active':'' ?>"><i class="fa fa-user-group"></i> Customers</a>
+        <a href="/super_admin_coming_soon.php?f=<?= urlencode('Accounts & Invoices') ?>" class="sb-link <?= $activeNav==='accounts'?'active':'' ?>"><i class="fa fa-file-invoice"></i> Accounts &amp; Invoices</a>
     </div>
 
     <div class="sb-group">
         <div class="sb-group-label">Website</div>
-        <a href="/shivam/super_admin_coming_soon.php?f=<?= urlencode('Banners & Reviews') ?>" class="sb-link <?= $activeNav==='banners'?'active':'' ?>"><i class="fa fa-images"></i> Banners &amp; Reviews</a>
-        <a href="/shivam/super_admin_pages.php" class="sb-link <?= $activeNav==='pages'?'active':'' ?>"><i class="fa fa-file-lines"></i> Pages</a>
-        <a href="/shivam/super_admin_settings.php" class="sb-link <?= $activeNav==='settings'?'active':'' ?>"><i class="fa fa-gear"></i> Settings</a>
+        <a href="/super_admin_coming_soon.php?f=<?= urlencode('Banners & Reviews') ?>" class="sb-link <?= $activeNav==='banners'?'active':'' ?>"><i class="fa fa-images"></i> Banners &amp; Reviews</a>
+        <a href="/super_admin_pages.php" class="sb-link <?= $activeNav==='pages'?'active':'' ?>"><i class="fa fa-file-lines"></i> Pages</a>
+        <a href="/super_admin_settings.php" class="sb-link <?= $activeNav==='settings'?'active':'' ?>"><i class="fa fa-gear"></i> Settings</a>
     </div>
 
     <div class="sb-footer">ColonyCare v1.0</div>
@@ -168,7 +168,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-prim
                 <div class="tb-avatar"><?= strtoupper(substr($_SESSION['user_name'] ?? 'S', 0, 2)) ?></div>
                 <div class="tb-user-info"><strong><?= htmlspecialchars($_SESSION['user_name'] ?? 'Superadmin') ?></strong><span><?= htmlspecialchars($_SESSION['user_email'] ?? '') ?></span></div>
             </div>
-            <a href="/shivam/auth/logout.php" class="tb-logout" title="Logout"><i class="fa fa-right-from-bracket"></i></a>
+            <a href="/auth/logout.php" class="tb-logout" title="Logout"><i class="fa fa-right-from-bracket"></i></a>
         </div>
     </header>
 

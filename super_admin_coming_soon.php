@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_admin') {
-    header('Location: /shivam/login.php?redirect=' . urlencode('/shivam/super_admin_coming_soon.php')); exit;
+    header('Location: /login.php?redirect=' . urlencode('/super_admin_coming_soon.php')); exit;
 }
 $feature = trim($_GET['f'] ?? 'This section');
 $pageTitle = $feature;

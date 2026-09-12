@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/notify_helper.php';
 
-define('DB_HOST','localhost'); define('DB_NAME','cc'); define('DB_USER','root'); define('DB_PASS','');
+// DB constants loaded via config.php
 $msg = $err = '';
 $openTab = '';        // which tab to auto-open after a POST (e.g. back to profile/mine after saving)
 $editErrorId = 0;     // listing id whose edit modal should reopen after a validation error
@@ -24,7 +24,7 @@ if ($logged_in && ($_GET['tab'] ?? '') === 'mine') {
 $can_post = $logged_in && in_array($user_role, ['resident','society_member','admin','buyer']);
 
 // Login link that returns the person to this exact page (with filters) afterward
-$loginUrl = '/shivam/login.php?redirect=' . urlencode('/shivam/listings.php' . (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] ? '?'.$_SERVER['QUERY_STRING'] : ''));
+$loginUrl = '/login.php?redirect=' . urlencode('/listings.php' . (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] ? '?'.$_SERVER['QUERY_STRING'] : ''));
 
 // Masks a phone number for display when the owner hasn't consented to show it publicly
 // e.g. "8077123456" -> "807712XXX"
@@ -67,11 +67,7 @@ $photosByListing = $photoIdsByListing = $myListingsEdit = [];
 $stats_total = $stats_active = $stats_unread = 0;
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
 
     // ── Ensure the listings table exists ────────────────────────
     // No enforced FOREIGN KEY constraints here — society_id/user_id are validated
@@ -636,15 +632,15 @@ $profile      = $profile ?? ['unit' => '', 'block' => '', 'name' => $user_name, 
 <title><?= htmlspecialchars($seoTitle) ?></title>
 <meta name="description" content="<?= htmlspecialchars($seoDescription) ?>">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.example.com/shivam/listings.php<?= ($f_type||$f_society||$f_bhk||$f_min||$f_max||$f_q) ? '?'.htmlspecialchars($_SERVER['QUERY_STRING'] ?? '') : '' ?>">
+<link rel="canonical" href="https://www.example.com/listings.php<?= ($f_type||$f_society||$f_bhk||$f_min||$f_max||$f_q) ? '?'.htmlspecialchars($_SERVER['QUERY_STRING'] ?? '') : '' ?>">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="<?= htmlspecialchars($seoTitle) ?>">
 <meta property="og:description" content="<?= htmlspecialchars($seoDescription) ?>">
-<meta property="og:url" content="https://www.example.com/shivam/listings.php">
+<meta property="og:url" content="https://www.example.com/listings.php">
 <meta property="og:site_name" content="ColonyCare">
 <?php if (!empty($listings) && !empty($listings[0]['photos'][0])): ?>
-<meta property="og:image" content="https://www.example.com/shivam/<?= htmlspecialchars($listings[0]['photos'][0]) ?>">
+<meta property="og:image" content="https://www.example.com/<?= htmlspecialchars($listings[0]['photos'][0]) ?>">
 <?php endif; ?>
 <meta name="twitter:card" content="summary_large_image">
 
@@ -863,7 +859,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-prim
 <header class="topbar">
   <div class="tb-brand"><i class="fa fa-building"></i> ColonyCare</div>
   <div class="tb-right">
-    <a href="/shivam/index.php" class="tb-btn"><i class="fa fa-arrow-left"></i> Home</a>
+    <a href="/index.php" class="tb-btn"><i class="fa fa-arrow-left"></i> Home</a>
     <?php if ($logged_in): ?>
       <button type="button" class="tb-user" onclick="goToProfile()" title="View my profile">
         <span class="tb-avatar"><?= htmlspecialchars(user_initials($profile['name'])) ?></span>
@@ -872,7 +868,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-prim
           <span class="tb-user-role"><?= htmlspecialchars($roleMeta['label']) ?></span>
         </span>
       </button>
-      <a href="/shivam/auth/logout.php" class="tb-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
+      <a href="/auth/logout.php" class="tb-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
     <?php else: ?>
       <a href="<?= htmlspecialchars($loginUrl) ?>" class="tb-btn tb-btn-primary"><i class="fa fa-right-to-bracket"></i> Login</a>
     <?php endif; ?>
@@ -979,7 +975,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-prim
             <div class="listing-card">
                 <?php if (!empty($l['photos'])): ?>
                 <div class="lc-photo" onclick='openGallery(<?= json_encode($l['photos']) ?>)' style="cursor:pointer;">
-                    <img src="/shivam/<?= htmlspecialchars($l['photos'][0]) ?>" alt="Flat photo" loading="lazy">
+                    <img src="/<?= htmlspecialchars($l['photos'][0]) ?>" alt="Flat photo" loading="lazy">
                     <?php if (count($l['photos']) > 1): ?>
                     <span class="lc-photo-count"><i class="fa fa-images"></i> <?= count($l['photos']) ?></span>
                     <?php endif; ?>
@@ -1049,7 +1045,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-prim
             <div class="listing-card">
                 <?php if (!empty($l['photos'])): ?>
                 <div class="lc-photo" onclick='openGallery(<?= json_encode($l['photos']) ?>)' style="cursor:pointer;">
-                    <img src="/shivam/<?= htmlspecialchars($l['photos'][0]) ?>" alt="Flat photo" loading="lazy">
+                    <img src="/<?= htmlspecialchars($l['photos'][0]) ?>" alt="Flat photo" loading="lazy">
                     <?php if (count($l['photos']) > 1): ?>
                     <span class="lc-photo-count"><i class="fa fa-images"></i> <?= count($l['photos']) ?></span>
                     <?php endif; ?>
@@ -1530,7 +1526,7 @@ function openEditModal(id){
     if (d.photos && d.photos.length) {
         grid.innerHTML = d.photos.map(p =>
             '<label class="edit-photo-item">' +
-                '<img src="/shivam/' + p.path + '" alt="Listing photo" loading="lazy">' +
+                '<img src="/' + p.path + '" alt="Listing photo" loading="lazy">' +
                 '<span class="edit-photo-del"><input type="checkbox" name="delete_photos[]" value="' + p.id + '"> Remove</span>' +
             '</label>'
         ).join('');
@@ -1661,7 +1657,7 @@ function openGallery(photos){
     overlay.innerHTML = `
         <button id="galClose" style="position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer;">&times;</button>
         <button id="galPrev" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1.3rem;width:44px;height:44px;border-radius:50%;cursor:pointer;">&#8249;</button>
-        <img id="galImg" src="/shivam/${photos[0]}" style="max-width:88vw;max-height:85vh;border-radius:10px;object-fit:contain;">
+        <img id="galImg" src="/${photos[0]}" style="max-width:88vw;max-height:85vh;border-radius:10px;object-fit:contain;">
         <button id="galNext" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1.3rem;width:44px;height:44px;border-radius:50%;cursor:pointer;">&#8250;</button>
         <span id="galCount" style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:#fff;font-size:.85rem;background:rgba(0,0,0,.5);padding:4px 12px;border-radius:99px;"></span>
     `;
@@ -1670,7 +1666,7 @@ function openGallery(photos){
 
     const img = overlay.querySelector('#galImg');
     const count = overlay.querySelector('#galCount');
-    function render(){ img.src = '/shivam/' + photos[idx]; count.textContent = (idx+1) + ' / ' + photos.length; }
+    function render(){ img.src = '/' + photos[idx]; count.textContent = (idx+1) + ' / ' + photos.length; }
     render();
 
     overlay.querySelector('#galPrev').onclick = (e) => { e.stopPropagation(); idx = (idx - 1 + photos.length) % photos.length; render(); };

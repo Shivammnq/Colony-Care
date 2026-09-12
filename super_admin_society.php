@@ -2,27 +2,20 @@
 session_start();
 
 if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_admin') {
-    header('Location: /shivam/login.php?redirect=' . urlencode($_SERVER['REQUEST_URI'])); exit;
+    header('Location: /login.php?redirect=' . urlencode($_SERVER['REQUEST_URI'])); exit;
 }
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $sid = (int)($_GET['id'] ?? 0);
 $user_id = $_SESSION['user_id'];
 $msg = $err = '';
 $validRoles = ['admin','staff','resident','accountant','vendor','society_member'];
 
-if (!$sid) { header('Location: /shivam/super_admin.php'); exit; }
+if (!$sid) { header('Location: /super_admin.php'); exit; }
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
     require_once __DIR__ . '/notify_helper.php';
 
     // ── POST handlers (all scoped to this one society) ──────────
@@ -128,7 +121,7 @@ try {
 
         if (!empty($msg)) $_SESSION['sa_flash_msg'] = $msg;
         if (!empty($err)) $_SESSION['sa_flash_err'] = $err;
-        header('Location: /shivam/super_admin_society.php?id=' . $sid); exit;
+        header('Location: /super_admin_society.php?id=' . $sid); exit;
     }
 
     $msg = $_SESSION['sa_flash_msg'] ?? '';
@@ -143,7 +136,7 @@ try {
     ");
     $society->execute([$sid]);
     $society = $society->fetch();
-    if (!$society) { header('Location: /shivam/super_admin.php'); exit; }
+    if (!$society) { header('Location: /super_admin.php'); exit; }
 
     // ── Residents / all users in this society ──────────────────
     $residents = $pdo->prepare("SELECT * FROM users WHERE society_id=? ORDER BY role, name");
@@ -194,7 +187,7 @@ try {
     $billing_stats = ['total'=>0,'collected'=>0,'pending'=>0,'overdue'=>0];
 }
 
-if (!$society) { header('Location: /shivam/super_admin.php'); exit; }
+if (!$society) { header('Location: /super_admin.php'); exit; }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -278,8 +271,8 @@ tr:last-child td{border-bottom:none;}
 <header class="topbar">
   <div class="tb-brand"><i class="fa fa-shield-halved"></i> ColonyCare Super Admin</div>
   <div class="tb-right">
-    <a href="/shivam/super_admin_societies.php" class="tb-btn"><i class="fa fa-arrow-left"></i> All Societies</a>
-    <a href="/shivam/logout.php" class="tb-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
+    <a href="/super_admin_societies.php" class="tb-btn"><i class="fa fa-arrow-left"></i> All Societies</a>
+    <a href="/logout.php" class="tb-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
   </div>
 </header>
 

@@ -2,15 +2,12 @@
 session_start();
 
 if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_admin') {
-    header('Location: /shivam/login.php?redirect=' . urlencode('/shivam/super_admin_settings.php')); exit;
+    header('Location: /login.php?redirect=' . urlencode('/super_admin_settings.php')); exit;
 }
 
 require __DIR__ . '/session_guard.php';
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 function detectDeviceLabel($ua) {
     $ua = $ua ?: '';
@@ -41,11 +38,7 @@ $devices = [];
 $userId = $_SESSION['user_id'];
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
 
     // ── Single-row platform settings table ────────────────────
     $pdo->exec("CREATE TABLE IF NOT EXISTS platform_settings (
@@ -168,12 +161,12 @@ try {
                 ->execute([$userId, $currentSid]);
             $_SESSION = [];
             session_destroy();
-            header('Location: /shivam/login.php'); exit;
+            header('Location: /login.php'); exit;
         }
 
         if (!empty($msg)) $_SESSION['sa_flash_msg'] = $msg;
         if (!empty($err)) $_SESSION['sa_flash_err'] = $err;
-        header('Location: /shivam/super_admin_settings.php'); exit;
+        header('Location: /super_admin_settings.php'); exit;
     }
 
     $settings = $pdo->query("SELECT * FROM platform_settings WHERE id=1")->fetch();

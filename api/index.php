@@ -1,22 +1,101 @@
 <?php
+// ── ColonyCare Vercel Serverless Entrypoint ─────────────────────────────────
 
-$requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$rootDir = dirname(__DIR__);
 
-$path = ltrim($requestUri, '/');
+// Set current working directory and PHP include path to project root
+chdir($rootDir);
+set_include_path(get_include_path() . PATH_SEPARATOR . $rootDir);
 
-if ($path === '') {
+// Normalize Request URI
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+$path = parse_url($requestUri, PHP_URL_PATH) ?? '/';
+
+// Decode URL path
+$path = rawurldecode($path);
+
+// Strip legacy /shivam prefix if present
+if (str_starts_with($path, '/shivam/')) {
+    $path = substr($path, 7);
+} elseif ($path === '/shivam') {
+    $path = '/';
+}
+
+$path = ltrim($path, '/');
+
+// Default route
+if ($path === '' || $path === '/') {
     $path = 'index.php';
 }
 
-if (preg_match('/^[a-zA-Z0-9_-]+\.php$/', $path)) {
-
-    $file = dirname(__DIR__) . '/' . $path;
-
-    if (file_exists($file)) {
-        require_once $file;
-        exit;
-    }
+// Clean URL support: /login -> login.php
+if (!pathinfo($path, PATHINFO_EXTENSION) && file_exists($rootDir . '/' . $path . '.php')) {
+    $path .= '.php';
 }
 
+$targetFile = $rootDir . '/' . $path;
+$realRoot = realpath($rootDir);
+$realTarget = realpath($targetFile);
+
+// Security check: ensure path is within project root and is a valid file
+if ($realTarget && str_starts_with($realTarget, $realRoot) && is_file($realTarget)) {
+    // If it is a PHP file, execute it
+    if (str_ends_with($realTarget, '.php')) {
+        $_SERVER['SCRIPT_FILENAME'] = $realTarget;
+        $_SERVER['SCRIPT_NAME']     = '/' . $path;
+        $_SERVER['PHP_SELF']        = '/' . $path;
+
+        require $realTarget;
+        exit;
+    }
+
+    // Static file fallback (MIME mapping)
+    $ext = strtolower(pathinfo($realTarget, PATHINFO_EXTENSION));
+    $mimes = [
+        'css'   => 'text/css',
+        'js'    => 'application/javascript',
+        'json'  => 'application/json',
+        'png'   => 'image/png',
+        'jpg'   => 'image/jpeg',
+        'jpeg'  => 'image/jpeg',
+        'gif'   => 'image/gif',
+        'svg'   => 'image/svg+xml',
+        'ico'   => 'image/x-icon',
+        'woff'  => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf'   => 'font/ttf',
+    ];
+
+    if (isset($mimes[$ext])) {
+        header('Content-Type: ' . $mimes[$ext]);
+    }
+    readfile($realTarget);
+    exit;
+}
+
+// 404 Response
 http_response_code(404);
-echo "404 - Page Not Found";
+header('Content-Type: text/html; charset=utf-8');
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Page Not Found</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8fafc; color: #1e293b; }
+        .box { text-align: center; background: white; padding: 40px 60px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        h1 { font-size: 4rem; margin: 0; color: #0f8f6f; }
+        p { font-size: 1.1rem; color: #64748b; margin: 10px 0 25px; }
+        a { background: #0f8f6f; color: white; text-decoration: none; padding: 10px 22px; border-radius: 8px; font-weight: 600; }
+        a:hover { background: #0d7a5f; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>404</h1>
+        <p>The page you requested could not be found.</p>
+        <a href="/">Go to Homepage</a>
+    </div>
+</body>
+</html>

@@ -2,13 +2,10 @@
 session_start();
 
 if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_admin') {
-    header('Location: /shivam/login.php?redirect=' . urlencode('/shivam/super_admin.php')); exit;
+    header('Location: /login.php?redirect=' . urlencode('/super_admin.php')); exit;
 }
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $msg = $err = '';
 $pageTitle = 'Dashboard';
@@ -19,11 +16,7 @@ $chart_months = []; $chart_values = [];
 $activity = [];
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
 
     // ── Top stat cards ──────────────────────────────────────────
     $stats['societies']     = (int)$pdo->query("SELECT COUNT(*) FROM societies")->fetchColumn();

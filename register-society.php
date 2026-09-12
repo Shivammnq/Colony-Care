@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (isset($_SESSION['user_id'])) { header("Location: /shivam/admin_dashboard.php"); exit; }
+if (isset($_SESSION['user_id'])) { header("Location: /admin_dashboard.php"); exit; }
 $errors  = $_SESSION['rs_errors'] ?? [];
 $old     = $_SESSION['rs_old']    ?? [];
 $success = $_SESSION['rs_success'] ?? '';
@@ -14,11 +14,11 @@ unset($_SESSION['rs_errors'], $_SESSION['rs_old'], $_SESSION['rs_success']);
 <title>Register Your Society - ColonyCare | Free RWA Management Software</title>
 <meta name="description" content="Register your residential society on ColonyCare — get visitor management, billing, complaints, event calendar, and facility booking, free to set up.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.example.com/shivam/register-society.php">
+<link rel="canonical" href="https://www.example.com/register-society.php">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Register Your Society - ColonyCare">
 <meta property="og:description" content="Register your residential society on ColonyCare — get visitor management, billing, complaints, event calendar, and facility booking, free to set up.">
-<meta property="og:url" content="https://www.example.com/shivam/register-society.php">
+<meta property="og:url" content="https://www.example.com/register-society.php">
 <meta property="og:site_name" content="ColonyCare">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
@@ -157,7 +157,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#
 <body>
 
 <div class="rs-left">
-    <a href="/shivam/index.php" class="back-home"><i class="fa fa-arrow-left"></i> Back to Home</a>
+    <a href="/index.php" class="back-home"><i class="fa fa-arrow-left"></i> Back to Home</a>
     <div class="rs-brand"><div class="brand-icon"><i class="fa fa-building"></i></div><h2>ColonyCare</h2></div>
     <h1>Register Your Society in Minutes</h1>
     <p>Join 500+ communities already using ColonyCare. Set up your society portal and take full control as admin.</p>
@@ -199,7 +199,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#
     <div class="alert alert-success"><i class="fa fa-circle-check" style="flex-shrink:0;margin-top:2px"></i><?=htmlspecialchars($success)?></div>
     <?php endif; ?>
 
-    <form method="POST" action="/shivam/process_register_society.php" id="rsForm">
+    <form method="POST" action="/process_register_society.php" id="rsForm">
 
         <!-- STEP 1: DETAILS -->
         <div class="form-section active" id="step1">
@@ -345,7 +345,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#
         </div>
 
     </form>
-    <div class="login-row">Already have an account? <a href="/shivam/login.php">Login</a></div>
+    <div class="login-row">Already have an account? <a href="/login.php">Login</a></div>
 </div>
 </div>
 
@@ -357,7 +357,7 @@ let sampleSocieties = [];
 
 document.addEventListener('DOMContentLoaded', function(){
     // Fetch data directly from your JSON file
-    fetch('/shivam/societies.json')
+    fetch('/societies.json')
         .then(res => res.json())
         .then(data => {
             sampleSocieties = data;
@@ -502,7 +502,7 @@ async function sendOTP(type){
     status.className='otp-status info';
     status.innerHTML='<i class="fa fa-spinner fa-spin"></i> Sending OTP...';
     try{
-        const res=await fetch('/shivam/otp_society_handler.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'send',type,value})});
+        const res=await fetch('/otp_society_handler.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'send',type,value})});
         const data=await res.json();
         if(data.success){
             status.className='otp-status success';
@@ -548,7 +548,7 @@ async function verifyOTP(type){
     if(otp.length!==6){status.className='otp-status error';status.textContent='Enter a 6-digit OTP.';return;}
     status.className='otp-status info';status.innerHTML='<i class="fa fa-spinner fa-spin"></i> Verifying...';
     try{
-        const res=await fetch('/shivam/otp_society_handler.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',type,value,otp})});
+        const res=await fetch('/otp_society_handler.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',type,value,otp})});
         const data=await res.json();
         if(data.success){
             status.className='otp-status success';

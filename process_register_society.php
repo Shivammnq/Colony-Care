@@ -1,11 +1,12 @@
 <?php
+require_once __DIR__ . '/config.php';
 session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // ── Only POST allowed ──────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: /shivam/register-society.php"); exit;
+    header("Location: /register-society.php"); exit;
 }
 
 // ── Check both OTPs are verified in session ────────────────
@@ -14,13 +15,13 @@ $phone_ok = !empty($_SESSION['phone_otp_verified']) || !empty($_SESSION['res_pho
 if (!$email_ok || !$phone_ok) {
     $_SESSION['rs_errors'] = ["Please verify both your email and phone OTP before registering."];
     $_SESSION['rs_old']    = $_POST;
-    header("Location: /shivam/register-society.php"); exit;
+    header("Location: /register-society.php"); exit;
 }
 
 if (($_POST['email_verified'] ?? '0') !== '1' || ($_POST['phone_verified'] ?? '0') !== '1') {
     $_SESSION['rs_errors'] = ["OTP verification incomplete. Please verify both email and phone."];
     $_SESSION['rs_old']    = $_POST;
-    header("Location: /shivam/register-society.php"); exit;
+    header("Location: /register-society.php"); exit;
 }
 
 function clean($v){ return htmlspecialchars(strip_tags(trim($v))); }
@@ -52,17 +53,14 @@ if (!preg_match('/^[0-9]{6}$/', $pincode)) $errors[] = "Pincode must be 6 digits
 if (!empty($errors)) {
     $_SESSION['rs_errors'] = $errors;
     $_SESSION['rs_old']    = $_POST;
-    header("Location: /shivam/register-society.php"); exit;
+    header("Location: /register-society.php"); exit;
 }
 
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=cc;charset=utf8mb4", "root", "", [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    $pdo = get_db_connection();
 } catch (PDOException $e) {
     $_SESSION['rs_errors'] = ["Database connection failed: " . $e->getMessage()];
-    header("Location: /shivam/register-society.php"); exit;
+    header("Location: /register-society.php"); exit;
 }
 
 $chk = $pdo->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
@@ -70,7 +68,7 @@ $chk->execute([$email]);
 if ($chk->fetch()) {
     $_SESSION['rs_errors'] = ["An account with this email already exists. Please login."];
     $_SESSION['rs_old']    = $_POST;
-    header("Location: /shivam/register-society.php"); exit;
+    header("Location: /register-society.php"); exit;
 }
 
 $chkS = $pdo->prepare("SELECT id FROM societies WHERE society_name = ? LIMIT 1");
@@ -78,7 +76,7 @@ $chkS->execute([$society_name]);
 if ($chkS->fetch()) {
     $_SESSION['rs_errors'] = ["A society with this name is already registered."];
     $_SESSION['rs_old']    = $_POST;
-    header("Location: /shivam/register-society.php"); exit;
+    header("Location: /register-society.php"); exit;
 }
 
 $hash = password_hash($password, PASSWORD_BCRYPT);
@@ -112,7 +110,7 @@ try {
         if ($superAdminIds) {
             notify($pdo, $society_id, $superAdminIds, $owner_user_id, 'approval',
                 'New society registered and awaiting approval: "' . $society_name . '" (' . $city . ', ' . $state . ')',
-                '/shivam/super_admin_societies.php'
+                '/super_admin_societies.php'
             );
         }
     } catch (Exception $notifyEx) { /* notification failure shouldn't block registration */ }
@@ -122,12 +120,12 @@ try {
           $_SESSION['rs_errors'], $_SESSION['rs_old']);
 
     $_SESSION['login_success'] = "✅ Society '{$society_name}' submitted! It's now awaiting Super Admin approval — you'll be notified once it's live.";
-    header("Location: /shivam/login.php"); exit;
+    header("Location: /login.php"); exit;
 
 } catch (Exception $e) {
     $pdo->rollBack();
     $_SESSION['rs_errors'] = ["Registration failed: " . $e->getMessage()];
     $_SESSION['rs_old']    = $_POST;
-    header("Location: /shivam/register-society.php"); exit;
+    header("Location: /register-society.php"); exit;
 }
 ?>

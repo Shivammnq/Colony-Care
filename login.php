@@ -1,8 +1,5 @@
 <?php
-// ── TEMPORARY DEBUG: shows PHP errors on screen instead of a blank page.
-//    Remove these two lines once the login issue is confirmed fixed. ──
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+require_once __DIR__ . '/config.php';
 
 session_start();
 
@@ -11,8 +8,11 @@ session_start();
 function safe_redirect_target($url) {
     if (!$url) return null;
     $url = trim($url);
-    if (str_starts_with($url, '/shivam/') && !str_contains($url, '://') && !str_starts_with($url, '//')) {
-        return $url;
+    if ((str_starts_with($url, '/') || str_starts_with($url, '/')) && !str_contains($url, '://') && !str_starts_with($url, '//')) {
+        if (str_starts_with($url, '/')) {
+            $url = substr($url, 7);
+        }
+        return '/' . ltrim($url, '/');
     }
     return null;
 }
@@ -34,7 +34,7 @@ if (isset($_SESSION['user_id'])) {
     $is_owner = false;
     $society_status = null;
     if (($_SESSION['user_role'] ?? '') === 'admin' && !empty($_SESSION['user_society_id'])) {
-        $pdoChk = new PDO("mysql:host=localhost;dbname=cc;charset=utf8mb4","root","",[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+        $pdoChk = get_db_connection();
         $hasStatusCol = $pdoChk->query("SHOW COLUMNS FROM societies LIKE 'status'")->fetch();
         if (!$hasStatusCol) {
             $pdoChk->exec("ALTER TABLE societies ADD COLUMN status ENUM('pending','approved','rejected') DEFAULT 'approved'");
@@ -56,28 +56,22 @@ if (isset($_SESSION['user_id'])) {
             ? 'Your society registration was not approved. Please contact support.'
             : "Your society is still awaiting Super Admin approval. You'll be notified once it's live.";
     } else {
-        if ($is_owner) { header('Location: /shivam/society.php'); exit; }
+        if ($is_owner) { header('Location: /society.php'); exit; }
 
         $redirect = match($_SESSION['user_role'] ?? 'resident') {
-            'admin'          => '/shivam/admin_dashboard.php',
-            'staff'          => '/shivam/gate_staff.php',
-            'resident'       => '/shivam/resident.php',
-            'accountant'     => '/shivam/accountant.php',
-            'vendor'         => '/shivam/vendor.php',
-            'society_member' => '/shivam/society-member.php',
-            'buyer'          => '/shivam/listings.php',
-            'super_admin'    => '/shivam/super_admin.php',
-            default          => '/shivam/resident.php',
+            'admin'          => '/admin_dashboard.php',
+            'staff'          => '/gate_staff.php',
+            'resident'       => '/resident.php',
+            'accountant'     => '/accountant.php',
+            'vendor'         => '/vendor.php',
+            'society_member' => '/society-member.php',
+            'buyer'          => '/listings.php',
+            'super_admin'    => '/super_admin.php',
+            default          => '/resident.php',
         };
         header('Location: ' . $redirect); exit;
     }
 }
-
-// ── DB config ──────────────────────────────────────────────
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
 
 $error   = $_SESSION['login_error'] ?? '';
 unset($_SESSION['login_error']);
@@ -85,7 +79,7 @@ $success = $_SESSION['login_success'] ?? '';
 unset($_SESSION['login_success']);
 
 // ── Handle POST ────────────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $email    = trim($_POST['email']    ?? '');
     $password = trim($_POST['password'] ?? '');
 
@@ -95,12 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Invalid email address.';
     } else {
         try {
-            $pdo = new PDO(
-                "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-                DB_USER, DB_PASS,
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-            );
+            $pdo = get_db_connection();
 
             // ── Ensure token_version column exists (session revocation) ──
             $hasTokenCol = $pdo->query("SHOW COLUMNS FROM users LIKE 'token_version'")->fetch();
@@ -170,18 +159,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ? 'Your society registration was not approved. Please contact support.'
                         : "Your society is still awaiting Super Admin approval. You'll be notified once it's live.";
                 } else {
-                    if ($is_owner) { header('Location: /shivam/society.php'); exit; }
+                    if ($is_owner) { header('Location: /society.php'); exit; }
 
                     $redirect = match($user['role']) {
-                        'admin'          => '/shivam/admin_dashboard.php',
-                        'staff'          => '/shivam/gate_staff.php',
-                        'resident'       => '/shivam/resident.php',
-                        'accountant'     => '/shivam/accountant.php',
-                        'vendor'         => '/shivam/vendor.php',
-                        'society_member' => '/shivam/society-member.php',
-                        'buyer'          => '/shivam/listings.php',
-                        'super_admin'    => '/shivam/super_admin.php',
-                        default          => '/shivam/resident.php',
+                        'admin'          => '/admin_dashboard.php',
+                        'staff'          => '/gate_staff.php',
+                        'resident'       => '/resident.php',
+                        'accountant'     => '/accountant.php',
+                        'vendor'         => '/vendor.php',
+                        'society_member' => '/society-member.php',
+                        'buyer'          => '/listings.php',
+                        'super_admin'    => '/super_admin.php',
+                        default          => '/resident.php',
                     };
                     header('Location: ' . $redirect); exit;
                 }
@@ -200,11 +189,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Login - ColonyCare | Society Management Portal</title>
 <meta name="description" content="Sign in to your ColonyCare account to manage visitor entry, billing, complaints, and events for your residential society.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.example.com/shivam/login.php">
+<link rel="canonical" href="https://www.example.com/login.php">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Login - ColonyCare">
 <meta property="og:description" content="Sign in to your ColonyCare account to manage visitor entry, billing, complaints, and events for your residential society.">
-<meta property="og:url" content="https://www.example.com/shivam/login.php">
+<meta property="og:url" content="https://www.example.com/login.php">
 <meta property="og:site_name" content="ColonyCare">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
@@ -267,7 +256,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
 
     <!-- LEFT PANEL -->
     <div class="login-left">
-        <a href="/shivam/index.php" class="back-home"><i class="fa fa-arrow-left"></i> Back to Home</a>
+        <a href="/index.php" class="back-home"><i class="fa fa-arrow-left"></i> Back to Home</a>
         <div class="login-brand">
             <div class="brand-icon"><i class="fa fa-building"></i></div>
             <h2>ColonyCare</h2>
@@ -341,7 +330,7 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
 
         <div class="divider"><span>or</span></div>
 
-        <a href="/shivam/google_callback.php" class="btn-google">
+        <a href="/google_callback.php" class="btn-google">
             <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.9 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
                 <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
@@ -352,13 +341,13 @@ body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
         </a>
 
         <div class="register-row">
-            New society? <a href="/shivam/register-society.php">Register Your Society</a>
+            New society? <a href="/register-society.php">Register Your Society</a>
         </div>
         <div class="register-row">
-            New resident? <a href="/shivam/register.php">Register as Resident</a>
+            New resident? <a href="/register.php">Register as Resident</a>
         </div>
         <div class="register-row">
-            Looking to buy/rent a flat? <a href="/shivam/register-buyer.php">Create a Free Account</a>
+            Looking to buy/rent a flat? <a href="/register-buyer.php">Create a Free Account</a>
         </div>
 
         <div class="secure-note">

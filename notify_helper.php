@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config.php';
 /**
  * notify_helper.php
  * Call notify() from any page to insert a notification row.

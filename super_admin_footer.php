@@ -32,7 +32,7 @@ function timeAgo(dateStr) {
     return Math.floor(diff/86400) + 'd ago';
 }
 function fetchNotifications() {
-    fetch('/shivam/notification_handler.php?action=fetch')
+    fetch('/notification_handler.php?action=fetch')
         .then(r=>r.json())
         .then(data=>{
             const dot = document.getElementById('notifDot');
@@ -56,7 +56,7 @@ function fetchNotifications() {
 }
 function markRead(id, e, link) {
     e.preventDefault();
-    fetch('/shivam/notification_handler.php', {
+    fetch('/notification_handler.php', {
         method:'POST',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:`action=mark_read&id=${id}`
@@ -66,7 +66,7 @@ function markRead(id, e, link) {
     });
 }
 function markAllRead() {
-    fetch('/shivam/notification_handler.php', {
+    fetch('/notification_handler.php', {
         method:'POST',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:'action=mark_read&id=0'
@@ -94,7 +94,7 @@ if (sbSearchInput) {
 }
 
 function runSearch(q) {
-    fetch('/shivam/super_admin_search.php?q=' + encodeURIComponent(q))
+    fetch('/super_admin_search.php?q=' + encodeURIComponent(q))
         .then(r => r.json())
         .then(data => {
             if (!data.success) { sbSearchResults.innerHTML = '<div class="sr-empty">Search failed.</div>'; sbSearchResults.classList.add('open'); return; }
@@ -110,20 +110,20 @@ function runSearch(q) {
             if (data.societies.length) {
                 html += '<div class="sr-group-label">Societies</div>';
                 data.societies.forEach(s => {
-                    html += `<a class="sr-item" href="/shivam/super_admin_society.php?id=${s.id}">${s.society_name}<div class="sr-sub">${s.city || ''}${s.city && s.state ? ', ' : ''}${s.state || ''}</div></a>`;
+                    html += `<a class="sr-item" href="/super_admin_society.php?id=${s.id}">${s.society_name}<div class="sr-sub">${s.city || ''}${s.city && s.state ? ', ' : ''}${s.state || ''}</div></a>`;
                 });
             }
             if (data.residents.length) {
                 html += '<div class="sr-group-label">Residents</div>';
                 data.residents.forEach(r => {
-                    html += `<a class="sr-item" href="/shivam/super_admin_residents.php">${r.name}<div class="sr-sub">${r.email} · ${r.society_name || 'No society'}</div></a>`;
+                    html += `<a class="sr-item" href="/super_admin_residents.php">${r.name}<div class="sr-sub">${r.email} · ${r.society_name || 'No society'}</div></a>`;
                 });
             }
             if (data.listings.length) {
                 html += '<div class="sr-group-label">Sale &amp; Rent Listings</div>';
                 data.listings.forEach(l => {
                     const unitLabel = (l.block ? l.block + '-' : '') + l.unit;
-                    html += `<a class="sr-item" href="/shivam/super_admin_saleandrent.php">${unitLabel} — ${l.listing_type}<div class="sr-sub">${l.society_name || ''} · ₹${Number(l.price).toLocaleString('en-IN')}</div></a>`;
+                    html += `<a class="sr-item" href="/super_admin_saleandrent.php">${unitLabel} — ${l.listing_type}<div class="sr-sub">${l.society_name || ''} · ₹${Number(l.price).toLocaleString('en-IN')}</div></a>`;
                 });
             }
             sbSearchResults.innerHTML = html;

@@ -1,27 +1,24 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) { header('Location: /shivam/login.php'); exit; }
+if (!isset($_SESSION['user_id'])) { header('Location: /login.php'); exit; }
 $role = $_SESSION['user_role'] ?? 'resident';
-if ($role === 'admin')      { header('Location: /shivam/admin_dashboard.php'); exit; }
-if ($role === 'resident')   { header('Location: /shivam/resident.php'); exit; }
-if ($role === 'staff')      { header('Location: /shivam/gate_staff.php'); exit; }
-if ($role === 'accountant') { header('Location: /shivam/accountant.php'); exit; }
-if ($role === 'vendor')     { header('Location: /shivam/vendor.php'); exit; }
-if ($role !== 'society_member') { header('Location: /shivam/login.php'); exit; }
+if ($role === 'admin')      { header('Location: /admin_dashboard.php'); exit; }
+if ($role === 'resident')   { header('Location: /resident.php'); exit; }
+if ($role === 'staff')      { header('Location: /gate_staff.php'); exit; }
+if ($role === 'accountant') { header('Location: /accountant.php'); exit; }
+if ($role === 'vendor')     { header('Location: /vendor.php'); exit; }
+if ($role !== 'society_member') { header('Location: /login.php'); exit; }
 
 $user_id    = $_SESSION['user_id'];
 $user_name  = $_SESSION['user_name'] ?? 'Member';
 $society_id = $_SESSION['user_society_id'] ?? 0;
-if (!$society_id) { header('Location: /shivam/login.php'); exit; }
+if (!$society_id) { header('Location: /login.php'); exit; }
 
-define('DB_HOST','localhost'); define('DB_NAME','cc'); define('DB_USER','root'); define('DB_PASS','');
+// DB constants loaded via config.php
 $msg = $err = '';
 
 try {
-    $pdo = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4", DB_USER, DB_PASS,[
-        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC
-    ]);
+    $pdo = get_db_connection();
 
     require_once __DIR__ . '/notify_helper.php';
 
@@ -75,7 +72,7 @@ try {
                 $admins = get_owner_and_admins($pdo, $society_id);
                 notify($pdo, $society_id, $admins, $user_id, 'complaint',
                     $user_name . ' raised a new complaint: ' . $subject,
-                    '/shivam/admin_dashboard.php#tab-complaints'
+                    '/admin_dashboard.php#tab-complaints'
                 );
 
                 $msg = 'Your complaint has been submitted. The admin will review it shortly.';
@@ -125,7 +122,7 @@ try {
             $msg = 'Profile updated!';
         }
 
-        header('Location: /shivam/society-member.php'); exit;
+        header('Location: /society-member.php'); exit;
     }
 
     // ── Fetch member's own data ────────────────────────────────────────
@@ -349,8 +346,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text-p
   <div class="tb-div"></div>
   <span class="tb-portal">Society Member - Household Management</span>
   <div class="tb-right">
-    <a href="/shivam/index.php" class="tb-btn tb-back"><i class="fa fa-arrow-left"></i> Back</a>
-    <a href="/shivam/logout.php" class="tb-btn tb-logout"><i class="fa fa-right-from-bracket"></i> Logout</a>
+    <a href="/index.php" class="tb-btn tb-back"><i class="fa fa-arrow-left"></i> Back</a>
+    <a href="/logout.php" class="tb-btn tb-logout"><i class="fa fa-right-from-bracket"></i> Logout</a>
     <button class="ham-btn" onclick="openMemMobNav()" aria-label="Menu"><i class="fa fa-bars"></i></button>
   </div>
 </header>
@@ -365,8 +362,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text-p
       <button class="mob-nav-item" onclick="openModal('complaintModal');closeMemMobNav()"><i class="fa fa-comments"></i> Raise Complaint</button>
     </div>
     <div class="mob-nav-foot">
-      <a href="/shivam/index.php" class="mob-back-btn"><i class="fa fa-arrow-left"></i> Back to Home</a>
-      <a href="/shivam/logout.php" class="mob-logout-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
+      <a href="/index.php" class="mob-back-btn"><i class="fa fa-arrow-left"></i> Back to Home</a>
+      <a href="/logout.php" class="mob-logout-btn"><i class="fa fa-right-from-bracket"></i> Logout</a>
     </div>
   </div>
 </div>

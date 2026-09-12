@@ -2,13 +2,10 @@
 session_start();
 
 if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'super_admin') {
-    header('Location: /shivam/login.php?redirect=' . urlencode('/shivam/super_admin_societies.php')); exit;
+    header('Location: /login.php?redirect=' . urlencode('/super_admin_societies.php')); exit;
 }
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'cc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// DB constants loaded via config.php
 
 $user_id = $_SESSION['user_id'];
 $msg = $_SESSION['sa_flash_msg'] ?? '';
@@ -19,11 +16,7 @@ $activeNav = 'societies';
 $societies_list = [];
 
 try {
-    $pdo = new PDO(
-        "mysql:host=".DB_HOST.";dbname=".DB_NAME.";charset=utf8mb4",
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
+    $pdo = get_db_connection();
     require_once __DIR__ . '/notify_helper.php';
 
     $hasStatusCol = $pdo->query("SHOW COLUMNS FROM societies LIKE 'status'")->fetch();
@@ -62,7 +55,7 @@ try {
             }
             if (!empty($msg)) $_SESSION['sa_flash_msg'] = $msg;
             if (!empty($err)) $_SESSION['sa_flash_err'] = $err;
-            header('Location: /shivam/super_admin_societies.php'); exit;
+            header('Location: /super_admin_societies.php'); exit;
         }
 
         if (in_array($action, ['approve','reject','suspend'])) {
@@ -73,12 +66,12 @@ try {
             $srow = $ownerStmt->fetch();
             if ($srow && $srow['owner_id']) {
                 $label = $newStatus === 'approved' ? 'has been approved! You now have full access.' : 'was not approved. Please contact support.';
-                notify($pdo, $sid, (int)$srow['owner_id'], $user_id, 'approval', 'Your society "' . $srow['society_name'] . '" ' . $label, '/shivam/society.php');
+                notify($pdo, $sid, (int)$srow['owner_id'], $user_id, 'approval', 'Your society "' . $srow['society_name'] . '" ' . $label, '/society.php');
             }
             $msg = 'Society status updated.';
             if (!empty($msg)) $_SESSION['sa_flash_msg'] = $msg;
             if (!empty($err)) $_SESSION['sa_flash_err'] = $err;
-            header('Location: /shivam/super_admin_societies.php'); exit;
+            header('Location: /super_admin_societies.php'); exit;
         }
     }
 
@@ -106,7 +99,7 @@ try {
 
         if (!empty($msg)) $_SESSION['sa_flash_msg'] = $msg;
         if (!empty($err)) $_SESSION['sa_flash_err'] = $err;
-        header('Location: /shivam/super_admin_societies.php'); exit;
+        header('Location: /super_admin_societies.php'); exit;
     }
 
     $societies_list = $pdo->query("
@@ -153,7 +146,7 @@ include __DIR__ . '/super_admin_header.php';
 ?>
 <tr style="border-bottom:1px solid var(--border);">
     <td style="padding:12px 16px;font-size:.85rem;">
-        <a href="/shivam/super_admin_society.php?id=<?= $s['id'] ?>" style="color:var(--green-dark);font-weight:700;text-decoration:none;"><?= htmlspecialchars($s['society_name']) ?></a><br>
+        <a href="/super_admin_society.php?id=<?= $s['id'] ?>" style="color:var(--green-dark);font-weight:700;text-decoration:none;"><?= htmlspecialchars($s['society_name']) ?></a><br>
         <span style="color:var(--text-muted);font-size:.76rem;">ID #<?= $s['id'] ?></span>
     </td>
     <td style="padding:12px 16px;font-size:.85rem;"><?= htmlspecialchars($s['owner_name'] ?? '—') ?><br><span style="color:var(--text-muted);font-size:.76rem;"><?= htmlspecialchars($s['owner_email'] ?? '') ?></span></td>
@@ -161,7 +154,7 @@ include __DIR__ . '/super_admin_header.php';
     <td style="padding:12px 16px;font-size:.85rem;"><?= (int)$s['member_count'] ?></td>
     <td style="padding:12px 16px;"><span style="background:<?= $badgeColors[$s['status']] ?>;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:99px;text-transform:capitalize;"><?= ucfirst($s['status']) ?></span></td>
     <td style="padding:12px 16px;white-space:nowrap;">
-        <a href="/shivam/super_admin_society.php?id=<?= $s['id'] ?>" style="background:var(--bg);color:var(--text-primary);border:1px solid var(--border);text-decoration:none;padding:6px 12px;border-radius:7px;font-size:.76rem;font-weight:600;display:inline-block;"><i class="fa fa-gear"></i> Manage</a>
+        <a href="/super_admin_society.php?id=<?= $s['id'] ?>" style="background:var(--bg);color:var(--text-primary);border:1px solid var(--border);text-decoration:none;padding:6px 12px;border-radius:7px;font-size:.76rem;font-weight:600;display:inline-block;"><i class="fa fa-gear"></i> Manage</a>
 
         <button type="button" class="edit-society-btn"
             data-id="<?= (int)$s['id'] ?>"

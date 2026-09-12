@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config.php';
 // includes/sidebar.php
 $role = $_SESSION['user_role'] ?? 'resident';
 ?>

@@ -1,11 +1,9 @@
 <?php
+require_once __DIR__ . '/config.php';
 session_start();
 
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=cc;charset=utf8mb4","root","",[
-        PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC
-    ]);
+    $pdo = get_db_connection();
 } catch(Exception $e) { die("DB Error: ".$e->getMessage()); }
 
 // ── Filters ──────────────────────────────────────────────────
@@ -61,7 +59,7 @@ if (!function_exists('societySlug')) {
 $seoTitle = 'Browse All Societies' . ($f_city ? " in $f_city" : '') . ' | ColonyCare';
 $seoDescription = 'Explore ' . $totalSocieties . ' residential societies' . ($f_city ? " in $f_city" : '')
     . ' on ColonyCare — view amenities, events, gallery, and available flats for each community.';
-$seoCanonical = 'https://www.example.com/shivam/societies.php' . ($_SERVER['QUERY_STRING'] ? '?' . htmlspecialchars($_SERVER['QUERY_STRING']) : '');
+$seoCanonical = 'https://www.example.com/societies.php' . ($_SERVER['QUERY_STRING'] ? '?' . htmlspecialchars($_SERVER['QUERY_STRING']) : '');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -89,7 +87,7 @@ $seoCanonical = 'https://www.example.com/shivam/societies.php' . ($_SERVER['QUER
         return [
             '@type' => 'ListItem',
             'position' => $i + 1,
-            'url' => 'https://www.example.com/shivam/society-profile.php?slug=' . urlencode(societySlug($s['society_name'])) . '&id=' . $s['id'],
+            'url' => 'https://www.example.com/society-profile.php?slug=' . urlencode(societySlug($s['society_name'])) . '&id=' . $s['id'],
             'name' => $s['society_name'],
         ];
     }, $societies, array_keys($societies))),
@@ -159,7 +157,7 @@ a{color:inherit;}
 
 <div class="sp-topbar">
     <div class="container">
-        <a href="/shivam/index.php" class="sp-back"><i class="fa fa-arrow-left"></i> Back to Home</a>
+        <a href="/index.php" class="sp-back"><i class="fa fa-arrow-left"></i> Back to Home</a>
     </div>
 </div>
 
@@ -180,7 +178,7 @@ a{color:inherit;}
         </select>
         <button type="submit"><i class="fa fa-search"></i> Search</button>
         <?php if ($f_q || $f_city): ?>
-        <a href="/shivam/societies.php" class="clear-link">Clear filters</a>
+        <a href="/societies.php" class="clear-link">Clear filters</a>
         <?php endif; ?>
     </form>
 
@@ -201,7 +199,7 @@ a{color:inherit;}
             $loc   = trim(($soc['city'] ?? '').', '.($soc['state'] ?? ''), ', ');
             $desc  = $soc['description'] ? (strlen($soc['description']) > 100 ? substr($soc['description'],0,100).'...' : $soc['description']) : '';
         ?>
-        <a href="/shivam/society-profile.php?slug=<?= urlencode($slug) ?>&id=<?= $soc['id'] ?>" class="fs-card">
+        <a href="/society-profile.php?slug=<?= urlencode($slug) ?>&id=<?= $soc['id'] ?>" class="fs-card">
             <div class="fs-card-img">
                 <img src="<?= $img ?>" alt="<?= htmlspecialchars($soc['society_name']) ?>" loading="lazy">
             </div>
