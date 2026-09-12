@@ -47,3 +47,4 @@ db_inspect.php
 fix_db.php
 patch_db.php
 seed_data.php
+.vercel
