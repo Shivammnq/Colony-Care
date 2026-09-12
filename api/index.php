@@ -34,23 +34,26 @@ if (!pathinfo($path, PATHINFO_EXTENSION) && file_exists($rootDir . '/' . $path .
 }
 
 $targetFile = $rootDir . '/' . $path;
-$realRoot = realpath($rootDir);
-$realTarget = realpath($targetFile);
 
-// Security check: ensure path is within project root and is a valid file
-if ($realTarget && str_starts_with($realTarget, $realRoot) && is_file($realTarget)) {
+// Prevent directory traversal
+$normalizedTarget = str_replace('\\', '/', $targetFile);
+$normalizedRoot = str_replace('\\', '/', $rootDir);
+
+// Execute file if it exists and is not directory traversal
+if (!str_contains($path, '..') && file_exists($targetFile) && is_file($targetFile)) {
     // If it is a PHP file, execute it
-    if (str_ends_with($realTarget, '.php')) {
-        $_SERVER['SCRIPT_FILENAME'] = $realTarget;
+    if (str_ends_with($targetFile, '.php')) {
+        $_SERVER['SCRIPT_FILENAME'] = $targetFile;
         $_SERVER['SCRIPT_NAME']     = '/' . $path;
         $_SERVER['PHP_SELF']        = '/' . $path;
 
-        require $realTarget;
+        header('Content-Type: text/html; charset=UTF-8');
+        require $targetFile;
         exit;
     }
 
     // Static file fallback (MIME mapping)
-    $ext = strtolower(pathinfo($realTarget, PATHINFO_EXTENSION));
+    $ext = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
     $mimes = [
         'css'   => 'text/css',
         'js'    => 'application/javascript',
@@ -69,7 +72,7 @@ if ($realTarget && str_starts_with($realTarget, $realRoot) && is_file($realTarge
     if (isset($mimes[$ext])) {
         header('Content-Type: ' . $mimes[$ext]);
     }
-    readfile($realTarget);
+    readfile($targetFile);
     exit;
 }
 
@@ -94,7 +97,7 @@ header('Content-Type: text/html; charset=utf-8');
 <body>
     <div class="box">
         <h1>404</h1>
-        <p>The page you requested could not be found.</p>
+        <p>The page you requested could not be found: <?= htmlspecialchars($path) ?></p>
         <a href="/">Go to Homepage</a>
     </div>
 </body>
